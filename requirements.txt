@@ -1,0 +1,18 @@
+# Python Package Requirements File
+# More info: http://pypi.python.org/pypi/pip
+
+# From the PyPi repository
+# Example: ``django``
+
+django
+django-debug-toolbar
+django-extensions
+djangorestframework
+docutils
+Fabric
+gunicorn
+psycopg2
+raven
+
+# From version control repositories
+# Example: ``-e git+URL#egg=NAME``
