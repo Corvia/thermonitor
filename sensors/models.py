@@ -9,6 +9,16 @@ OPERATORS = (
 )
 
 
+"""
+Zone
+
+A container of multiple sensors. Sensors are grouped by Zone in the UI and API.
+
+- By default, sort these by name.
+- API Key is automatically generated when we create new Zones. This is set in pre_save
+  listener in zone_set_api_key in sensors.signals.
+
+"""
 class Zone(models.Model):
 	name = models.CharField(
 		"Building Name",
@@ -23,8 +33,28 @@ class Zone(models.Model):
 	key = models.CharField(
 		"Unique API Key",
 		max_length = 32,
+		blank = True, # Initially needs to allow blank fields for the signal to work.
 	)
 
+	def __unicode__(self):
+		return self.name
+
+	class Meta:
+		ordering = ["name"]
+
+
+"""
+Sensor Device
+
+- Each sensor has a GUID. This is a unique identifer pulled from the device itself,
+  it could be a MAC address, serial number, etc. It doesn't matter, it just needs to be
+  unique.
+- Minimum and maximum value checks are optional, they won't be checked if they are left
+  blank. This means each sensor can have 0, 1 or 2 checks.
+- If the sensor fails the check, everyone in the associated alert groups will receive a notification.
+- state_last_change_date will help us track how long a device has been failed or working fine.
+
+"""
 
 class Sensor(models.Model):
 	name = models.CharField(
@@ -75,12 +105,28 @@ class Sensor(models.Model):
 		help_text = "Groups to notify when this sensor is triggered."
 	)
 	state = models.BooleanField(default = False)
-	state_last_change = models.DateTimeField(
+	state_last_change_date = models.DateTimeField(
 		"Last State Change",
 		blank = True,
-		help_text = "Timestamp of the last state change of this sensor."
+		help_text = "Date/Time of the last state change of this sensor."
 	)
 
+	def __unicode__(self):
+		return "%s - %s" % (self.zone.name, self.name)
+
+	class Meta:
+		ordering = ["zone__name", "name"]
+
+
+"""
+Sensor Data
+
+- We expect all of our sensors in this app to store values in a Decimal format (XXX.X).
+- Record if this value is outside of the range checks for the sensor and if the state
+  changed compared to the last check (OK -> failed, failed -> OK). This will allow us
+  graph/query data points where the checks failed and how many times relatively easily.
+
+"""
 
 class SensorData(models.Model):
 	sensor = models.ForeignKey(Sensor)
@@ -96,3 +142,9 @@ class SensorData(models.Model):
 
 	""" If this sensor state changed since the last time data was reported. Might be useful for reporting. """
 	state_changed = models.BooleanField()
+
+	def __unicode__(self):
+		return "%s - %s" % (self.sensor.name, self.value)
+
+	class Meta:
+		ordering = ["-datetime"]

@@ -1,8 +1,13 @@
 from django.db import models
 from django.contrib.auth.models import User
-from sensors.models import Sensor
 
-# Create your models here.
+"""
+Alert Group
+
+- Group of Django user contacts that will be notified when an associated sensor fails.
+- We can have multiple groups of contacts associated with each sensor.
+
+"""
 
 class SensorAlertGroup(models.Model):
 	name = models.CharField(
@@ -15,9 +20,26 @@ class SensorAlertGroup(models.Model):
 	)
 	users = models.ManyToManyField(User)
 
+	def __unicode__(self):
+		return self.name
+
+
+"""
+Alert
+
+- Track when users are alerted a sensor has an issue.
+- Basically, just a log of when things went haywire or were fixed.
+
+"""
 
 class SensorAlert(models.Model):
-	date = models.DateTimeField(auto_now=True)
+	
 	user = models.ForeignKey(User)
-	sensor = models.ForeignKey(Sensor)
+	sensor = models.ForeignKey("sensors.Sensor")
+	data_point = models.ForeignKey("sensors.SensorData")
 	message = models.TextField()
+	date = models.DateTimeField(auto_now=True)
+
+
+	def __unicode__(self):
+		return "%s - %s - %s" % (self.sensor.user.name, self.sensor.name, self.message)
