@@ -1,12 +1,21 @@
 from django.db import models
+import operator
 # Create your models here.
 
-OPERATORS = (
+OPERATOR_CHOICES = (
 	('>',  '>'),
 	('<',  '<'),
 	('>=', '>='),
 	('<=', '<='),
 )
+
+OPERATOR_LOOKUP = {
+	'>': operator.gt,
+	'<': operator.lt,
+	'>=': operator.ge,
+	'<=': operator.le,
+}
+
 
 
 """
@@ -83,7 +92,7 @@ class Sensor(models.Model):
 		"Minimum Value Check Operator",
 		max_length = 3,
 		blank = True,
-		choices = OPERATORS,
+		choices = OPERATOR_CHOICES,
 		help_text = "Comparison operator for the lower range check."
 	)
 	max_value = models.DecimalField(
@@ -96,7 +105,7 @@ class Sensor(models.Model):
 		"Minimum Value Check Operator",
 		max_length = 3,
 		blank = True,
-		choices = OPERATORS,
+		choices = OPERATOR_CHOICES,
 		help_text = "Comparison operator for the upper range check."
 	)
 	alert_groups = models.ManyToManyField(
@@ -115,6 +124,25 @@ class Sensor(models.Model):
 
 	class Meta:
 		ordering = ["zone__name", "name"]
+
+	""" 
+	Compare a sensor data value to the thresholds specified in this Sensor object.
+	- If set, use the minimum and maximum thresholds to pull the specified operator
+	  from the OPERATOR_LOOKUP mapping above.
+	- Returns True if value is OK
+	- Returns False if value is not meeting the thresholds
+
+	TODO:
+	- Some idiot could add an operator to only OPERATOR_CHOICES, resulting in a key error below. Validate for this.
+	- Data model assumes we could have 0, 1, or 2 checks. Fine for this project. Not OK for other projects.
+	"""
+	def check_value(self, value):
+		if self.min_value_operator and not OPERATOR_LOOKUP[self.min_value_operator](value, self.min_value):
+			return False
+		if self.max_value_operator and not OPERATOR_LOOKUP[self.max_value_operator](value, self.max_value):
+			return False
+		# Nothing out of the ordinary, assume we are fine...
+		return True
 
 
 """
