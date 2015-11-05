@@ -100,7 +100,6 @@ class Sensor(models.Model):
 		help_text = "Comparison operator for the upper range check."
 	)
 	alert_groups = models.ManyToManyField(
-		"Sensor Alert Groups",
 		"notifications.SensorAlertGroup",
 		help_text = "Groups to notify when this sensor is triggered."
 	)
