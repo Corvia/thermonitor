@@ -1,0 +1,71 @@
+@import url(https://fonts.googleapis.com/css?family=Lato:400,300,700,400italic,300italic|Inconsolata:400,700);
+
+
+hr {
+    border-color: #1d83b1;
+}
+
+@fixed-font: 'Inconsolata', monospace;
+.mute {color: #3e85a8};
+
+.bright {
+    color: #cd5454;
+}
+
+h2 {
+    font-weight: 200;
+}
+
+body {
+    margin-top: 45px;
+    margin-bottom: 80px;
+    color: #07ceff;
+    font-family: 'Lato', sans-serif;
+    background: #282953;
+    background: -moz-linear-gradient(45deg,  #1c2040 0%, #294360 49%, #3e2a5e 100%);
+    background: -webkit-gradient(linear, left bottom, right top, color-stop(0%,#1c2040), color-stop(49%,#294360), color-stop(100%,#3e2a5e));
+    background: -webkit-linear-gradient(45deg,  #1c2040 0%,#294360 49%,#3e2a5e 100%);
+    background: -o-linear-gradient(45deg,  #1c2040 0%,#294360 49%,#3e2a5e 100%);
+    background: -ms-linear-gradient(45deg,  #1c2040 0%,#294360 49%,#3e2a5e 100%);
+    background: linear-gradient(45deg,  #1c2040 0%,#294360 49%,#3e2a5e 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#1c2040', endColorstr='#3e2a5e',GradientType=1 );
+}
+
+header {
+    .logo {
+        position: relative;
+        top: -33px;
+        float: left;
+        width: 137px;
+        height: 90px;
+        background-image: url(/static/img/logo.png);
+        background-repeat: no-repeat;
+        background-position: center center;
+        background-size: 100%;
+    }
+    .current-datetime {
+        position: relative;
+        top: -26px;
+        float: right;
+        font-weight: 300;
+        text-align: right;
+        .date {
+            display: block;
+            font-size: 1.5em;
+            color: #159ac9;
+        }
+        .time {
+            display: block;
+            font-size: 2.4em;
+        }
+    }
+    h1 {
+        text-align: center;
+        font-size: 3.4em;
+        font-weight: 300;
+    }
+}
+
+.container.notifications .row {
+    font-family: @fixed-font;
+}
