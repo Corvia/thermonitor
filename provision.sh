@@ -42,3 +42,6 @@ chown -R vagrant:vagrant ${HOMEDIR}
 
 sudo ln -s /usr/bin/nodejs /usr/bin/node
 sudo npm install -g bower
+
+cd ${PROJECTDIR}
+bower install jquery bootstrap
