@@ -16,6 +16,65 @@ h2 {
     font-weight: 200;
 }
 
+.vertical {
+  margin: auto;
+  display: block;
+  width: 170px;
+  height: 20px;
+  -webkit-transform: rotate(-90deg);
+  transform: rotate(-90deg);
+  margin-bottom: 80px;
+}
+
+.progress {
+    background: transparent;
+    border: 1px solid #1495c3;
+    padding: 1px;
+    border-radius: 15px;
+}
+
+.row.gauges > div {
+    padding-top: 80px;
+    text-align: center;
+    vertical-align: bottom;
+    min-height: 260px;
+}
+.progress-bar-info, .progress-bar-danger {
+    border-radius: 15px;
+}
+.progress-bar-danger {
+    background-color: #cd5454;
+}
+.progress-bar-info {
+    background-color: #17a8dc;
+}
+
+.center {
+    text-align: center;
+}
+
+.footer {
+    margin-top: 45px;
+    text-align: center;
+    color: #2b789b;
+    font-size: 0.85em;
+    hr {
+        border-color: #1d637d !important;
+    }
+}
+
+.gauge-temp {
+    font-size: 1.8em;
+    font-weight: 300;
+}
+.gauge-label {
+    display: block;
+    font-family: @fixed-font;
+    font-size: 0.9em;
+    line-height: 1em;
+    color: #117ca1;
+}
+
 body {
     margin-top: 45px;
     margin-bottom: 80px;
