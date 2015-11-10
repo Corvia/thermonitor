@@ -10,7 +10,11 @@ from django.conf import settings
 """
 class BaseAlert:
     def __init__(self, sensor, sensor_data):
+<<<<<<< HEAD
         self.name = self.__class__.__name__
+=======
+        self.name = self.__class__.__name__.lower()
+>>>>>>> 009ee7916e5d96e6da9406594a794ad7c01fba46
         self.sensor = sensor
         self.sensor_data = sensor_data
 
