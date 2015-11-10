@@ -37,6 +37,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
     'notifications',
     'sensors',
 )
@@ -72,6 +73,10 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'djthermonitor.wsgi.application'
 
+REST_FRAMEWORK = {
+    'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.NamespaceVersioning',
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination'
+}
 
 # Database
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
