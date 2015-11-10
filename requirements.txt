@@ -12,7 +12,9 @@ docutils
 Fabric
 gunicorn
 psycopg2
+pytest
 raven
+requests
 
 # From version control repositories
 # Example: ``-e git+URL#egg=NAME``
