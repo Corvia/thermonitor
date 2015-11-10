@@ -120,6 +120,11 @@ class Sensor(models.Model):
         blank = True,
         help_text = "Date/Time of the last state change of this sensor."
     )
+    create_date = models.DateTimeField(
+        "Sensor Create Date",
+        auto_now_add = True,
+        help_text = "Automatically set to the date the sensor is saved. Used for helping determine if the device is down.",
+    )
 
     def __unicode__(self):
         return "%s - %s" % (self.zone.name, self.name)
