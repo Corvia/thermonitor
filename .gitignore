@@ -3,3 +3,4 @@
 *.pyc
 *.sqlite3
 static/vendor/*
+settings_local.py
