@@ -1,6 +1,7 @@
 from django.db import models
 import operator
-from decimal import Decimal
+from djthermonitor.utils import celsius_to_fahrenheit
+
 # Create your models here.
 
 OPERATOR_CHOICES = (
@@ -20,14 +21,14 @@ OPERATOR_LOOKUP = {
 
 
 """
-Zone
-
-A container of multiple sensors. Sensors are grouped by Zone in the UI and API.
-
-- By default, sort these by name.
-- API Key is automatically generated when we create new Zones. This is set in pre_save
-  listener in zone_set_api_key in sensors.signals.
-
+# Zone
+#
+# A container of multiple sensors. Sensors are grouped by Zone in the UI and API.
+#
+# - By default, sort these by name.
+# - API Key is automatically generated when we create new Zones. This is set in pre_save
+#   listener in zone_set_api_key in sensors.signals.
+# 
 """
 class Zone(models.Model):
     name = models.CharField(
@@ -54,18 +55,18 @@ class Zone(models.Model):
 
 
 """
-Sensor Device
-
-- Each sensor has a GUID. This is a unique identifer pulled from the device itself,
-  it could be a MAC address, serial number, etc. It doesn't matter, it just needs to be
-  unique.
-- Minimum and maximum value checks are optional, they won't be checked if they are left
-  blank. This means each sensor can have 0, 1 or 2 checks.
-- If the sensor fails the check, everyone in the associated alert groups will receive a notification.
-- state_last_change_date will help us track how long a device has been failed or working fine.
-
+# Sensor Device
+# 
+# - Each sensor has a GUID. This is a unique identifer pulled from the device itself,
+#   it could be a MAC address, serial number, etc. It doesn't matter, it just needs to be
+#  unique.
+# - Minimum and maximum value checks are optional, they won't be checked if they are left
+#   blank. This means each sensor can have 0, 1 or 2 checks.
+# - If the sensor fails the check, everyone in the associated alert groups will receive a notification.
+# - state_last_change_date will help us track how long a device has been failed or working fine.
+# - Sensor device temperatures are saved in Fahrenheit.
+# 
 """
-
 class Sensor(models.Model):
     name = models.CharField(
         "Sensor Name",
@@ -84,10 +85,10 @@ class Sensor(models.Model):
         help_text = "Notes specific to this sensor, location, contact information.",
     )
     min_value = models.DecimalField(
-        "Minimum Check Value",
+        "Minimum Check Value ('F)",
         max_digits = 4,
         decimal_places = 1,
-        help_text = "Lower range threshold value."
+        help_text = "Lower range threshold value, in degrees Fahrenheit."
     )
     min_value_operator = models.CharField(
         "Minimum Value Check Operator",
@@ -97,10 +98,10 @@ class Sensor(models.Model):
         help_text = "Comparison operator for the lower range check."
     )
     max_value = models.DecimalField(
-        "Maximum Check Value",
+        "Maximum Check Value ('F)",
         max_digits = 4,
         decimal_places = 1,
-        help_text = "Upper range threshold value."
+        help_text = "Upper range threshold value, in degrees Fahrenheit."
     )
     max_value_operator = models.CharField(
         "Minimum Value Check Operator",
@@ -127,15 +128,15 @@ class Sensor(models.Model):
         ordering = ["zone__name", "name"]
 
     """ 
-    Compare a sensor data value to the thresholds specified in this Sensor object.
-    - If set, use the minimum and maximum thresholds to pull the specified operator
-      from the OPERATOR_LOOKUP mapping above.
-    - Returns True if value is OK
-    - Returns False if value is not meeting the thresholds
-
-    TODO:
-    - Some idiot could add an operator to only OPERATOR_CHOICES, resulting in a key error below. Validate for this.
-    - Data model assumes we could have 0, 1, or 2 checks. Fine for this project. Not OK for other projects.
+    # Compare a sensor data value to the thresholds specified in this Sensor object.
+    # - If set, use the minimum and maximum thresholds to pull the specified operator
+    #   from the OPERATOR_LOOKUP mapping above.
+    # - Returns True if value is OK
+    # - Returns False if value is not meeting the thresholds
+    # 
+    # TODO:
+    # - Some idiot could add an operator to only OPERATOR_CHOICES, resulting in a key error below. Validate for this.
+    # - Data model assumes we could have 0, 1, or 2 checks. Fine for this project. Not OK for other projects.
     """
     def check_value(self, value):
         if self.min_value_operator and not OPERATOR_LOOKUP[self.min_value_operator](value, self.min_value):
@@ -148,9 +149,9 @@ class Sensor(models.Model):
 
 
     """
-    Get all users assigned to receive alerts from a sensor.
-
-    Return a list of user objects.
+    # Get all users assigned to receive alerts from a sensor.
+    # 
+    # Return a list of user objects.
     """
     def get_alert_users(self):
         users = []
@@ -161,23 +162,33 @@ class Sensor(models.Model):
     
         return users
 
+    """
+    # Get the Fahrenheit version of the min_value and max_value decimal fields.
+    # 
+    # Returns an integer of the temperature in Fahrenheit
+    """
+    def min_value_f(self):
+        return celsius_to_fahrenheit(self.min_value)
+
+    def max_value_f(self):
+        return celsius_to_fahrenheit(self.max_value)
 
 
 """
-Sensor Data
-
-- We expect all of our sensors in this app to store values in a Decimal format (XXX.X).
-- Record if this value is outside of the range checks for the sensor and if the state
-  changed compared to the last check (OK -> failed, failed -> OK). This will allow us
-  graph/query data points where the checks failed and how many times relatively easily.
-
+# Sensor Data
+#
+# - We expect all of our sensors in this app to store values in a Decimal format (XXX.X).
+# - Record if this value is outside of the range checks for the sensor and if the state
+#   changed compared to the last check (OK -> failed, failed -> OK). This will allow us
+#   graph/query data points where the checks failed and how many times relatively easily.
+# - Sensor data is logged in Celsius.
 """
 
 class SensorData(models.Model):
     sensor = models.ForeignKey(Sensor)
     datetime = models.DateTimeField(auto_now_add = True)
     value = models.DecimalField(
-        "Sensor Data Value - Celcius",
+        "Sensor Data Value - Celsius",
         max_digits = 4,
         decimal_places = 1,
     )
@@ -195,7 +206,7 @@ class SensorData(models.Model):
         ordering = ["-datetime"]
 
     """
-    Return the temperature value in degrees Fahrenheit
+    # Return the temperature value in degrees Fahrenheit
     """
     def value_f(self):
-        return int(Decimal(9.0 / 5.0) * self.value + Decimal(32.0))
+        return celsius_to_fahrenheit(self.value)
