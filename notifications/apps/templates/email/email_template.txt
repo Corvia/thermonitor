@@ -1,0 +1,12 @@
+Hello,
+
+{{ message }}
+
+{% for data in sensor_data %}
+{{ data.datetime|date:"n/j h:i A" }} - {{ data.value }} 'F
+{% endfor %}
+
+The {{ sensor.name }} sensor is configured to alert you if the temperature is {% if sensor.min_value %}{{ sensor.min_value_operator }} {{ sensor.min_value }} 'F{% endif %} {% if sensor.min_value and sensor.max_value %}and{% endif %} {% if sensor.max_value %}{{ sensor.max_value_operator }} {{ sensor.max_value }} 'F{% endif %}.
+
+Thanks,
+Thermonitor Bot
