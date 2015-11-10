@@ -6,18 +6,22 @@ from django.template.loader import get_template
 from django.template import Context
 
 class Email(BaseAlert):
+    # Sensor is failing and outside of temperature threshold checks.
     def alert(self):
         self.subject = "%s Temperature Alert - %s 'F" % (self.sensor.name, self.sensor_data.value_f())
         self.message = "Please check %s at %s, temperature monitoring reports %s 'F." % (self.sensor.name, self.sensor.zone.name, self.sensor_data.value_f())
 
+    # Sensor is late to report in or unavailable.
     def down(self):
         self.subject = "%s Temperature Monitoring Unavailable" % (self.sensor.name)
         self.message = "Please check %s at %s, temperature monitoring is currently down. Internet or device issue." % (self.sensor.name, self.sensor.zone.name)
 
+    # Sensor temperature is now within threshold checks or has come back online.
     def recovered(self):
         self.subject = "%s Temperature is OK - %s 'F" % (self.sensor.name, self.sensor_data.value_f())
         self.message = "Temperature of %s at %s appears to have recovered, now reporting %s 'F." % (self.sensor.name, self.sensor.zone.name, self.sensor_data.value_f())
 
+    # Obtain the list of all emails that this alert should be delivered to.
     def setup(self):
         self.recipients = []
         users = self.sensor.get_alert_users()
@@ -25,8 +29,12 @@ class Email(BaseAlert):
             if user.email:
                 self.recipients.append(user.email)
 
+    """
+    # Deliver a multi-part text/HTML email using the django template framework to render the parts of the email.
+    # In the future we may want to BCC contacts or send separate emails to each individual to provide
+    # some kind of privacy if that becomes necessary.
+    """
     def send(self):
-
         message_text = get_template("email/email_template.txt")
         message_html = get_template("email/email_template.html")
 
