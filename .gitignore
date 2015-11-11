@@ -3,3 +3,8 @@
 *.pyc
 *.sqlite3
 static/vendor/*
+settings_local.py
+
+# pytest litter
+*/.cache/*
+.cache/*

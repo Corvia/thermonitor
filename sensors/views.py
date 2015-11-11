@@ -62,6 +62,10 @@ class SensorViewSet(viewsets.ModelViewSet):
             ids = [int(id) for id in request.GET['sensor_ids'].split(',')]
             queryset = queryset.filter(id__in=ids)
 
+        if 'guids' in request.GET:
+            ids = request.GET['guids'].split(',')
+            queryset = queryset.filter(guid__in=ids)
+
         if 'zone_ids' in request.GET:
             ids = [int(id) for id in request.GET['zone_ids'].split(',')]
             queryset = queryset.filter(zone_id__in=ids)
@@ -243,18 +247,38 @@ class SensorDataViewSet(mixins.CreateModelMixin,
         `state` and `state_last_change_date` values will be updated accordingly
         too.
 
+        You can optionally send along `guid` with the request, and it will
+        automatically be associated with the matching `Sensor`. If a `Sensor` does not
+        exist, it will be created.
+
         Arguments:
         request -- The API request containing the data for the new object.
 
         Returns:
         A new `SensorData` object containing the data in `request`.
         """
-        sensor_url = request.data['sensor']
-        sensor_id = int([x for x in sensor_url.split('/') if x][-1])
-        sensor = Sensor.objects.get(pk=sensor_id)
         zone = _get_zone(request)
-        if sensor.zone.id != zone.id:
-            _raise_zone_key_auth_failed()
+
+        # `sensor` sent. Associate data with this `Sensor`.
+        if "sensor" in request.data:
+            sensor_url = request.data['sensor']
+            sensor_id = int([x for x in sensor_url.split('/') if x][-1])
+            sensor = Sensor.objects.get(pk=sensor_id)
+            if sensor.zone.id != zone.id:
+                _raise_zone_key_auth_failed()
+        # `guid` sent. Automatically associate with that particular `Sensor`.
+        # Create a `Sensor` if a matching `guid` does not already exist.
+        elif "guid" in request.data:
+            try:
+                sensor = Sensor.objects.get(zone=zone, guid=request.data['guid'])
+            except Sensor.DoesNotExist:
+                sensor = Sensor()
+                sensor.name = request.data['guid']
+                sensor.guid = request.data['guid']
+                sensor.zone = zone
+                sensor.save()
+            
+            request.data['sensor'] = reverse('sensor-detail', args=[sensor.id], request=request)
 
         return super(SensorDataViewSet, self).create(request)
 

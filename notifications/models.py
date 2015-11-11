@@ -34,12 +34,29 @@ Alert
 
 class SensorAlert(models.Model):
 	
-	user = models.ForeignKey(User)
+	users = models.ManyToManyField(User, blank=True)
 	sensor = models.ForeignKey("sensors.Sensor")
 	data_point = models.ForeignKey("sensors.SensorData")
+	alert_type = models.CharField(
+		"Alert Type",
+		max_length = 60,
+		help_text = "Type of Alert: alert, recovered, down",
+		blank = True,
+	)
+	alert_class = models.CharField(
+		"Alert Class",
+		max_length = 60,
+		help_text = "The method the user was notified. Ex: Email, Twilio, POS, etc.",
+		blank = True,
+	)
+	recipients = models.TextField(
+		"Raw Recipients List",
+		help_text = "List of email addresses, phone numbers, etc. that this alert was sent to.",
+		blank = True,
+	)
 	message = models.TextField()
 	date = models.DateTimeField(auto_now=True)
 
 
 	def __unicode__(self):
-		return "%s - %s - %s" % (self.sensor.user.name, self.sensor.name, self.message)
+		return "%s - %s - %s" % (self.sensor.name, self.message, self.recipients)

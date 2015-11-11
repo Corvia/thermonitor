@@ -1,6 +1,40 @@
 #!/usr/bin/python
 
 """
+Thermonitor API client for digitemp DS9097 client.
+
+
+Testing:
+
+To test the digitemp_DS9097 command without any actual real hardware,
+you can set CMD_EXECUTABLE below to "python ./digitemp_ds9097_fake_tester.py"
+to emulate some fake data. There's an example line below. See that script in 
+the "scripts" directory for more details.
+
+
+Setup:
+
+0. Copy this script to the device you will be running it on.
+1. Change the API_ZONE_KEY and API_URL below. Zone key will be set in the django admin
+    after you create the zone.
+2. Setup cron to run the script as often as you'd like to report the temperatures. Something like:
+
+*/15 * * * * /usr/bin/python /path/to/termonitor_collect.py >/dev/null 2>&1
+
+"""
+
+API_ZONE_KEY = "FDEA9C52EBCA4F6D9B873FFF059F0392"
+API_URL = "http://localhost:9000/api/v1/"
+API_HEADERS = {'Content-type': 'application/json'}
+API_TIMEOUT = 4.0 # Time out API requests after this many seconds
+
+CMD_EXECUTABLE = "digitemp_DS9097"
+CMD_ARGUMENTS = "-a"
+
+# Uncomment this line for digitemp fake data generator.
+#CMD_EXECUTABLE = "python digitemp_ds9097_fake_tester.py"
+
+"""
 
 Sample results of digitemp command. We're looking for the valid lines
 with a hardware address and temperature readout.
@@ -48,14 +82,13 @@ import os
 import re
 import sys
 import distutils.spawn
-
-
-CMD_EXECUTABLE = "digitemp_DS9097"
-CMD_ARGUMENTS = "-a"
+import json
+import requests
 
 
 # Check that the digitemp executable actually exists, quit if it is not installed.
-if not distutils.spawn.find_executable(CMD_EXECUTABLE):
+# Also ignore the python test script emulator... it doesn't work with this check.
+if not "python" in CMD_EXECUTABLE and not distutils.spawn.find_executable(CMD_EXECUTABLE):
     sys.exit("Unable to locate the '%s' executable. Is it installed or in the path?" % (CMD_EXECUTABLE))
 
 
@@ -80,5 +113,28 @@ for line in os.popen("%s %s" % (CMD_EXECUTABLE, CMD_ARGUMENTS)).readlines():
 
     print "OK:\tID: %s\tTemp: %s" % (serial, temperature)
 
-    # TODO - Hooray! At this point we'll ship the data to the API.
+    data = {
+        'guid': serial,
+        'value': temperature,
+        'key': API_ZONE_KEY,
+    }
+
+    try:
+        response = requests.post(
+            API_URL + "data/", 
+            data=json.dumps(data), 
+            headers=API_HEADERS, 
+            timeout=API_TIMEOUT,
+        )
+        print response.json()
+    except:
+        # In the event of a timeout, just try the next set of data. Hopefully it will
+        # eventually come back. If we want to get more complex with timeout handling, here's
+        # the documentation for it. I don't think it's really necessary at this point.
+        # http://docs.python-requests.org/en/latest/user/quickstart/#timeouts
+        pass
+
+
+
+
 

@@ -739,6 +739,62 @@ class TestSensorsApi(object):
         response = requests.post(api_root + 'data/{}/'.format(self.data[0].id))
         assert response.status_code == 405
 
+    def test_sensor_data_detail_post_guid(self, api_root):
+        """
+        Test adding sensor data with only supplying a Sensor guid, sensor data value
+        and a zone key. If the sensor doesn't exist, this will create it.
+        """
+        zone = Zone(name='Test Zone', key=uuid4())
+        zone.save()
+
+        guid = 'DEADBEEF00000012345TEST'
+        value_first = 15.0
+        value_second = 25.0
+        num_sensors_before_add = Sensor.objects.all().count()
+
+        data_dict = {
+            'guid': guid,
+            'value': value_first,
+            'key': str(zone.key),
+        }
+        headers = {'Content-type': 'application/json'}
+        response = requests.post(api_root + 'data/',
+            data=json.dumps(data_dict),
+            headers=headers)
+        response_json_first = response.json()
+
+        num_sensors_after_add = Sensor.objects.all().count()
+
+        assert response.status_code == 201
+        assert num_sensors_before_add + 1 == num_sensors_after_add
+
+        data = SensorData.objects.get(pk=response_json_first["id"])
+        data.delete()
+
+        data_dict = {
+            'guid': guid,
+            'value': value_second,
+            'key': str(zone.key),
+        }
+        headers = {'Content-type': 'application/json'}
+        response = requests.post(api_root + 'data/',
+            data=json.dumps(data_dict),
+            headers=headers)
+        response_json_second = response.json()
+
+        num_sensors_after_second_request = Sensor.objects.all().count()
+
+        # Ensure we didn't add another sensor
+        assert response.status_code == 201
+        assert num_sensors_after_add == num_sensors_after_second_request
+        assert response_json_first["sensor"] == response_json_second["sensor"]
+
+        data = SensorData.objects.get(pk=response_json_second["id"])
+        sensor = Sensor.objects.get(pk=data.sensor.id)
+        data.delete()
+        sensor.delete()
+
+
     def test_sensor_data_detail_put(self, api_root):
         response = requests.put(api_root + 'data/{}/'.format(self.data[0].id))
         assert response.status_code == 405

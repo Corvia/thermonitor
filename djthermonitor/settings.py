@@ -60,6 +60,7 @@ TEMPLATES = [
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
             os.path.join(BASE_DIR, 'templates'),
+            os.path.join(BASE_DIR, 'notifications/apps/templates'),
         ],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -123,3 +124,9 @@ STATICFILES_DIRS = (
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/home/media/media.lawrence.com/static/"
 STATIC_ROOT = os.path.join(BASE_DIR, 'static_compiled')
+
+
+try:
+    from settings_local import *
+except ImportError:
+    pass
