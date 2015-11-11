@@ -119,12 +119,21 @@ class Sensor(models.Model):
         "notifications.SensorAlertGroup",
         help_text = "Groups to notify when this sensor is triggered."
     )
-    state = models.BooleanField(default = False)
+    state = models.BooleanField(
+        "Sensor OK",
+        default = False,
+        help_text = "If True, sensor is within threshold checks."
+    )
     state_last_change_date = models.DateTimeField(
         "Last State Change",
         blank = True,
         help_text = "Date/Time of the last state change of this sensor.",
         auto_now_add = True,
+    )
+    down = models.BooleanField(
+        "Sensor Offline",
+        default = True,
+        help_text = "If True, Sensor is offline.",
     )
     create_date = models.DateTimeField(
         "Sensor Create Date",
@@ -209,7 +218,7 @@ class SensorData(models.Model):
     state = models.BooleanField()
 
     """ If this sensor state changed since the last time data was reported. Might be useful for reporting. """
-    state_changed = models.BooleanField()
+    state_changed = models.BooleanField(default=False)
 
     def __unicode__(self):
         return "%s - %s" % (self.sensor.name, self.value)

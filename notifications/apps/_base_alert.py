@@ -13,6 +13,7 @@ class BaseAlert:
         self.name = self.__class__.__name__
         self.sensor = sensor
         self.sensor_data = sensor_data
+        self.alert_type = "" # Set in utils.py / send_notification
 
         self.settings = {}
         if self.name in settings.NOTIFICATIONS:
@@ -24,6 +25,8 @@ class BaseAlert:
     # alert, recovered and down methods all configure this class for sending
     # out a notification based on the state of the sensor.
     """
+
+    message_types = ["alert", "down", "recovered"]
 
     # Sensor exceeds threshold checks and is failing
     def alert(self):

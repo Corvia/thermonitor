@@ -1,5 +1,6 @@
 from ._base_alert import BaseAlert
 from sensors.models import SensorData
+from notifications.models import SensorAlert
 
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import get_template
@@ -51,3 +52,16 @@ class Email(BaseAlert):
         msg = EmailMultiAlternatives(self.subject, text_content, self.settings["FROM_ADDRESS"], self.recipients)
         msg.attach_alternative(html_content, "text/html")
         msg.send()
+
+        alert = SensorAlert()
+        alert.sensor = self.sensor
+        alert.data_point = self.sensor_data
+        alert.alert_type = self.alert_type
+        alert.alert_class = self.__class__.__name__
+        alert.recipients = ", ".join(self.recipients)
+        alert.message = self.subject
+        alert.save()
+        alert.users = self.sensor.get_alert_users()
+        alert.save()
+
+

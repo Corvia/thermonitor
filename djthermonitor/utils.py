@@ -6,4 +6,4 @@ from decimal import Decimal
 # Returns an integer.
 """
 def celsius_to_fahrenheit(temp_c_decimal):
-    return int(Decimal(9.0 / 5.0) * temp_c_decimal + Decimal(32.0))
+    return int(Decimal(9.0 / 5.0) * Decimal(temp_c_decimal) + Decimal(32.0))
