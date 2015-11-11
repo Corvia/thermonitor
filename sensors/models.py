@@ -89,8 +89,8 @@ class Sensor(models.Model):
         "Minimum Check Value ('F)",
         max_digits = 4,
         decimal_places = 1,
-        help_text = "Lower range threshold value, in degrees Fahrenheit.",
-        default = "33.0",
+        help_text = "Lower range threshold value, in degrees Celsius.",
+        default = "2.0",
     )
     min_value_operator = models.CharField(
         "Minimum Value Check Operator",
@@ -104,8 +104,8 @@ class Sensor(models.Model):
         "Maximum Check Value ('F)",
         max_digits = 4,
         decimal_places = 1,
-        help_text = "Upper range threshold value, in degrees Fahrenheit.",
-        default = "45.0",
+        help_text = "Upper range threshold value, in degrees Celsius.",
+        default = "10.0",
     )
     max_value_operator = models.CharField(
         "Minimum Value Check Operator",
@@ -121,7 +121,7 @@ class Sensor(models.Model):
     )
     state = models.BooleanField(
         "Sensor OK",
-        default = False,
+        default = True,
         help_text = "If True, sensor is within threshold checks."
     )
     state_last_change_date = models.DateTimeField(
@@ -215,7 +215,7 @@ class SensorData(models.Model):
     )
     
     """ State of this sensor. True is status is within limits, False is the status is failing a check. """
-    state = models.BooleanField()
+    state = models.BooleanField(default=True)
 
     """ If this sensor state changed since the last time data was reported. Might be useful for reporting. """
     state_changed = models.BooleanField(default=False)
