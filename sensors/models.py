@@ -88,27 +88,31 @@ class Sensor(models.Model):
         "Minimum Check Value ('F)",
         max_digits = 4,
         decimal_places = 1,
-        help_text = "Lower range threshold value, in degrees Fahrenheit."
+        help_text = "Lower range threshold value, in degrees Fahrenheit.",
+        default = "33.0",
     )
     min_value_operator = models.CharField(
         "Minimum Value Check Operator",
         max_length = 3,
         blank = True,
         choices = OPERATOR_CHOICES,
-        help_text = "Comparison operator for the lower range check."
+        help_text = "Comparison operator for the lower range check.",
+        default = ">",
     )
     max_value = models.DecimalField(
         "Maximum Check Value ('F)",
         max_digits = 4,
         decimal_places = 1,
-        help_text = "Upper range threshold value, in degrees Fahrenheit."
+        help_text = "Upper range threshold value, in degrees Fahrenheit.",
+        default = "45.0",
     )
     max_value_operator = models.CharField(
         "Minimum Value Check Operator",
         max_length = 3,
         blank = True,
         choices = OPERATOR_CHOICES,
-        help_text = "Comparison operator for the upper range check."
+        help_text = "Comparison operator for the upper range check.",
+        default = "<",
     )
     alert_groups = models.ManyToManyField(
         "notifications.SensorAlertGroup",
@@ -118,16 +122,14 @@ class Sensor(models.Model):
     state_last_change_date = models.DateTimeField(
         "Last State Change",
         blank = True,
-        help_text = "Date/Time of the last state change of this sensor."
+        help_text = "Date/Time of the last state change of this sensor.",
+        auto_now_add = True,
     )
-<<<<<<< HEAD
     create_date = models.DateTimeField(
         "Sensor Create Date",
         auto_now_add = True,
         help_text = "Automatically set to the date the sensor is saved. Used for helping determine if the device is down.",
     )
-=======
->>>>>>> 009ee7916e5d96e6da9406594a794ad7c01fba46
 
     def __unicode__(self):
         return "%s - %s" % (self.zone.name, self.name)
