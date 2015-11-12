@@ -54,3 +54,12 @@ DATABASES = {
 
 
 SECRET_KEY = '@@@@DJANGO_SECRET@@@@'
+
+
+
+#EMAIL_BACKEND = 'django_ses.SESBackend'
+# These are optional -- if they're set as environment variables they won't
+# need to be set here as well
+#AWS_ACCESS_KEY_ID = 'YOUR-ACCESS-KEY-ID'
+#AWS_SECRET_ACCESS_KEY = 'YOUR-SECRET-ACCESS-KEY'
+
