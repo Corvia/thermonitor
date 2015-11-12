@@ -3,7 +3,7 @@
 A hardware + web application project to continuously monitor thermometers and to
 dispatch notification if they dip above or below regular operating temperatures.
 
-![](http://bpk-disk.s3.amazonaws.com/v1MVP.png)
+(http://bpk-disk.s3.amazonaws.com/v1MVP.png)
 
 ## Documentation
 ### API
@@ -27,3 +27,6 @@ An optional `--server` command line argument dictates the base URL the tests
 use, e.g.,
 
     $ py.test -v --server=http://127.0.0.1:9000
+=======
+A hardware + web application project to continuously monitor thermometers and to dispatch notification if they dip above or below regular operating temperatures.
+
