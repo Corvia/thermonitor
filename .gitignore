@@ -4,6 +4,7 @@
 *.sqlite3
 static/vendor/*
 settings_local.py
+node_modules
 
 # pytest litter
 */.cache/*
