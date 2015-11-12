@@ -89,8 +89,8 @@ class Sensor(models.Model):
         "Minimum Check Value ('F)",
         max_digits = 4,
         decimal_places = 1,
-        help_text = "Lower range threshold value, in degrees Celsius.",
-        default = "2.0",
+        help_text = "Lower range threshold value, in degrees Fahrenheit.",
+        default = "35.0",
     )
     min_value_operator = models.CharField(
         "Minimum Value Check Operator",
@@ -104,8 +104,8 @@ class Sensor(models.Model):
         "Maximum Check Value ('F)",
         max_digits = 4,
         decimal_places = 1,
-        help_text = "Upper range threshold value, in degrees Celsius.",
-        default = "10.0",
+        help_text = "Upper range threshold value, in degrees Fahrenheit.",
+        default = "75.0",
     )
     max_value_operator = models.CharField(
         "Minimum Value Check Operator",
@@ -190,10 +190,10 @@ class Sensor(models.Model):
     Returns an integer of the temperature in Fahrenheit
     """
     def min_value_f(self):
-        return celsius_to_fahrenheit(self.min_value)
+        return int(self.min_value)
 
     def max_value_f(self):
-        return celsius_to_fahrenheit(self.max_value)
+        return int(self.max_value)
 
 
 """
@@ -203,14 +203,14 @@ Sensor Data
  - Record if this value is outside of the range checks for the sensor and if the state
    changed compared to the last check (OK -> failed, failed -> OK). This will allow us
    graph/query data points where the checks failed and how many times relatively easily.
- - Sensor data is logged in Celsius.
+ - Sensor data is logged in Fahrenheit.
 """
 
 class SensorData(models.Model):
     sensor = models.ForeignKey(Sensor)
     datetime = models.DateTimeField(auto_now_add = True)
     value = models.DecimalField(
-        "Sensor Data Value - Celsius",
+        "Sensor Data Value - Fahrenheit",
         max_digits = 4,
         decimal_places = 1,
     )
@@ -229,6 +229,7 @@ class SensorData(models.Model):
 
     """
      Return the temperature value in degrees Fahrenheit
+     Used to be the case we would store values in Celsius, but those days are over...
     """
     def value_f(self):
-        return celsius_to_fahrenheit(self.value)
+        return int(self.value)
