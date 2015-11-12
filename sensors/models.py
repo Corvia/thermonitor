@@ -117,12 +117,13 @@ class Sensor(models.Model):
     )
     alert_groups = models.ManyToManyField(
         "notifications.SensorAlertGroup",
-        help_text = "Groups to notify when this sensor is triggered."
+        help_text = "Groups to notify when this sensor is triggered.",
+        blank=True,
     )
     state = models.BooleanField(
         "Sensor OK",
         default = True,
-        help_text = "If True, sensor is within threshold checks."
+        help_text = "If True, sensor is within threshold checks.",
     )
     state_last_change_date = models.DateTimeField(
         "Last State Change",

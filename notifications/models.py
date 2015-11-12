@@ -18,7 +18,7 @@ class SensorAlertGroup(models.Model):
 		"Alert Group Description",
 		blank = True,
 	)
-	users = models.ManyToManyField(User)
+	users = models.ManyToManyField(User, blank=True)
 
 	def __unicode__(self):
 		return self.name
