@@ -56,6 +56,8 @@ DATABASES = {
 SECRET_KEY = '@@@@DJANGO_SECRET@@@@'
 
 # Amazon SES
+DEFAULT_FROM_EMAIL = "webmaster@corviatech.com"
+SERVER_EMAIL = "webmaster@corviatech.com"
 #EMAIL_BACKEND = 'django_smtp_ssl.SSLEmailBackend'
 #EMAIL_HOST = 'email-smtp.us-east-1.amazonaws.com'
 #EMAIL_PORT = 465
