@@ -55,11 +55,11 @@ DATABASES = {
 
 SECRET_KEY = '@@@@DJANGO_SECRET@@@@'
 
-
-
-#EMAIL_BACKEND = 'django_ses.SESBackend'
-# These are optional -- if they're set as environment variables they won't
-# need to be set here as well
-#AWS_ACCESS_KEY_ID = 'YOUR-ACCESS-KEY-ID'
-#AWS_SECRET_ACCESS_KEY = 'YOUR-SECRET-ACCESS-KEY'
+# Amazon SES
+#EMAIL_BACKEND = 'django_smtp_ssl.SSLEmailBackend'
+#EMAIL_HOST = 'email-smtp.us-east-1.amazonaws.com'
+#EMAIL_PORT = 465
+#EMAIL_HOST_USER = 'my_smtp_username'
+#EMAIL_HOST_PASSWORD = 'my_smtp_password'
+#EMAIL_USE_TLS = True
 

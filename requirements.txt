@@ -7,7 +7,7 @@
 django
 django-debug-toolbar
 django-extensions
-django-ses
+django-smtp-ssl
 djangorestframework
 docutils
 Fabric
