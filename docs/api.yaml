@@ -619,6 +619,12 @@ definitions:
         format: url
         description: |
           The absolute URL for the `Zone` to which the `Sensor` belongs.
+      latest_value:
+        type: number
+        format: decimal
+        description: |
+          Read-only. The most recent `SensorData` value reported by this
+          `Sensor`.
       min_value:
         type: number
         format: decimal

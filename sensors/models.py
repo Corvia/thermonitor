@@ -194,6 +194,14 @@ class Sensor(models.Model):
     def max_value_f(self):
         return celsius_to_fahrenheit(self.max_value)
 
+    @property
+    def latest_value(self):
+        """Get the most recent `SensorData` value reported by this `Sensor`."""
+        try:
+            return SensorData.objects.filter(sensor=self).order_by('-datetime').first().value
+        except SensorData.DoesNotExist:
+            return None
+
 
 """
 Sensor Data
