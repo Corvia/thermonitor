@@ -157,6 +157,8 @@ for line in os.popen("%s %s" % (CMD_EXECUTABLE, CMD_ARGUMENTS)).readlines():
         print "NOT DATA:\t%s" % (line.rstrip())
         continue
 
+    temperature = round(float(temperature), 1)
+
     print "OK:\tID: %s\tTemp: %s" % (serial, temperature)
 
     data = {
