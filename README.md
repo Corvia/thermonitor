@@ -17,7 +17,7 @@ Tests are located in the `test` directory and can be run with `pytest`, e.g.,
     $ py.test -v
 
 The REST API tests depend on a running web server. The simplest way to achieve
- thisis to use Django's built-in web server, e.g.,
+this is to use Django's built-in web server, e.g.,
 
     $ cd thermonitor
     $ source bin/activate
