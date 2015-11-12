@@ -1,0 +1,32 @@
+<p>Hello,</p>
+
+<p>{{ message }}</p>
+
+{% for data in sensor_data %}
+<div style="font-family:monospace;padding:5px;border-bottom:1px solid #aeaeae;">
+   <span style="color:#3e3e3e">{{ data.datetime|date:"n/j h:i A" }} - </span>
+   <span style="color:#{% if data.state %}0174DF{% else %}B40404{% endif %}">{{ data.value }} &deg;F</span>
+</div>
+{% endfor %}
+<br>
+<br>
+
+<p>The {{ sensor.name }} sensor is configured to alert you if the temperature is 
+
+{% if sensor.min_value %}
+<strong>{{ sensor.min_value_operator }} {{ sensor.min_value }}&deg;F</strong>
+{% endif %}
+
+{% if sensor.min_value and sensor.max_value %}
+and
+{% endif %}
+
+{% if sensor.max_value %}
+<strong>{{ sensor.max_value_operator }} {{ sensor.max_value }}&deg;F</strong>
+{% endif %}
+
+.</p>
+<br>
+Thanks,<br>
+Thermonitor Bot<br>
+<pre>༼ つ ◕_◕ ༽つ</pre>

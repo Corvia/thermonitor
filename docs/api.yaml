@@ -1,0 +1,697 @@
+swagger: '2.0'
+info:
+  version: 1.0.0
+  title: 'Thermonitor API'
+host: sqrts.com
+paths:
+  /api/v1/zones:
+    get:
+      description: |
+        Gets a collection of `Zone` objects.
+      parameters:
+        - name: limit
+          in: query
+          description: |
+            The maximum number of elements to return in the result set.
+          required: false
+          type: integer
+          format: int32
+        - name: offset
+          in: query
+          description: |
+            The number of elements to skip before returning the result set.
+          required: false
+          type: integer
+          format: int32
+        - name: zone_ids
+          in: query
+          description: |
+            A comma-separated list of `Zone` IDs. If specified, only `Zone`s
+            with matching IDs will be included in the result set.
+          required: false
+          type: string
+        - name: sensor_ids
+          in: query
+          description: |
+            A comma-separated list of `Sensor` IDs. If specified, only `Zone`s
+            associated with matching `Sensor`s will be included in the result
+            set.
+          required: false
+          type: string
+        - name: order_by
+          in: query
+          description: |
+            The field by which the result set will be ordered. To specify
+            descending order, prefix the field name with a hyphen (e.g., `-id`).
+            If this parameter is omitted, results will be sorted by their IDs in
+            ascending order.
+          required: false
+          type: string
+      tags:
+        - Sensors
+      responses:
+        '200':
+          description: An array of `Zone`s.
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Zone'
+        default:
+          description: Unexpected error
+          schema:
+            type: object
+            $ref: '#/definitions/Error'
+  /api/v1/zones/{id}:
+    get:
+      description: |
+        Gets a `Zone` object.
+      parameters:
+        - name: id
+          in: path
+          description: |
+            The ID of the `Zone` to get.
+          required: true
+          type: integer
+          format: int32
+      responses:
+        '200':
+          description: |
+            The `Zone` object whose ID is `id`.
+          schema:
+            type: object
+            $ref: '#/definitions/Zone'
+        default:
+          description: Unexpected error
+          schema:
+            type: object
+            $ref: '#/definitions/Error'
+    put:
+      description: |
+        Updates a `Zone` using a full object representation.
+      parameters:
+        - name: id
+          in: path
+          description: |
+            The ID of the `Zone` to update.
+          required: true
+          type: integer
+          format: int32
+        - name: sensor
+          in: body
+          description: |
+            The full representation of the `Zone` to update. All modifiable
+            fields are required. The request body must also contain the `key`
+            value for the `Zone` to which the `Zone` belongs. If the `key` is
+            missing or invalid, an authorization error will occur.
+          schema:
+            title: Sensor
+            type: object
+            $ref: '#/definitions/Zone'
+      responses:
+        '200':
+          description: |
+            The `Zone` was updated successfully.
+          schema:
+            title: Sensor
+            type: object
+            $ref: '#/definitions/Zone'
+        '403':
+          description: |
+            Authorization failed for the request. This will occur if the
+            request's `key` value is missing or invalid.
+          schema:
+            title: Error
+            type: object
+            $ref: '#/definitions/Error'
+        default:
+          description: An unexpected error occurred.
+          schema:
+            title: Error
+            type: object
+            $ref: '#/definitions/Error'
+    patch:
+      description: |
+        Updates a `Zone` using a partial object representation.
+      parameters:
+        - name: id
+          in: path
+          description: |
+            The ID of the `Zone` to update.
+          required: true
+          type: integer
+          format: int32
+        - name: sensor
+          in: body
+          description: |
+            A partial representation of the `Zone` to update. The request
+            body must also contain the `key` value for the `Zone` to which the
+            `Zone` belongs. If the `key` is missing or invalid, an
+            authorization error will occur.
+          schema:
+            title: Sensor
+            type: object
+            $ref: '#/definitions/Zone'
+      responses:
+        '200':
+          description: |
+            The `Zone` was updated successfully.
+          schema:
+            title: Sensor
+            type: object
+            $ref: '#/definitions/Zone'
+        '403':
+          description: |
+            Authorization failed for the request. This will occur if the
+            request's `key` value is missing or invalid.
+          schema:
+            title: Error
+            type: object
+            $ref: '#/definitions/Error'
+        default:
+          description: An unexpected error occurred.
+          schema:
+            title: Error
+            type: object
+            $ref: '#/definitions/Error'
+  /api/v1/sensors:
+    get:
+      description: |
+        Gets a collection of `Sensor` objects.
+      parameters:
+        - name: limit
+          in: query
+          description: |
+            The maximum number of elements to return in the result set.
+          required: false
+          type: integer
+          format: int32
+        - name: offset
+          in: query
+          description: |
+            The number of elements to skip before returning the result set.
+          required: false
+          type: integer
+          format: int32
+        - name: sensor_ids
+          in: query
+          description: |
+            A comma-separated list of `Sensor` IDs. If specified, only `Sensor`s
+            with matching IDs will be included in the result set.
+          required: false
+          type: string
+        - name: zone_ids
+          in: query
+          description: |
+            A comma-separated list of `Zone` IDs. If specified, only `Sensor`s
+            belonging to the specified `Zone`s will be included in the result
+            set.
+          required: false
+          type: string
+        - name: order_by
+          in: query
+          description: |
+            The field by which the result set will be ordered. To specify
+            descending order, prefix the field name with a hyphen (e.g., `-id`).
+            If this parameter is omitted, results will be sorted by their IDs in
+            ascending order.
+          required: false
+          type: string
+      tags:
+        - Sensors
+      responses:
+        '200':
+          description: An array of `Sensor`s.
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Sensor'
+        default:
+          description: Unexpected error
+          schema:
+            type: object
+            $ref: '#/definitions/Error'
+    post:
+      description: |
+        Creates a new `Sensor` object.
+      parameters:
+        - name: Sensor
+          in: body
+          description: |
+            The details of the `Sensor` to create. The request body must also
+            contain the `key` value for the `Zone` to which the `Sensor`
+            belongs. If the `key` is missing or invalid, an authorization error
+            will occur.
+          required: true
+          schema:
+            title: Sensor
+            type: object
+            $ref: '#/definitions/Sensor'
+      responses:
+        '201':
+          description: |
+            The `Sensor` was created successfully.
+          schema:
+            title: Sensor
+            type: object
+            $ref: '#/definitions/Sensor'
+        '403':
+          description: |
+            Authorization failed for the request. This will occur if the
+            request's `key` value is missing or invalid.
+          schema:
+            title: Error
+            type: object
+            $ref: '#/definitions/Error'
+        default:
+          description: |
+            An unexpected error occurred.
+          schema:
+            title: Error
+            type: object
+            $ref: '#/definitions/Error'
+  /api/v1/sensors/{id}:
+    get:
+      description: |
+        Gets a `Sensor` object.
+      parameters:
+        - name: id
+          in: path
+          description: |
+            The ID of the `Sensor` to get.
+          required: true
+          type: integer
+          format: int32
+      responses:
+        '200':
+          description: |
+            The `Sensor` object whose ID is `id`.
+          schema:
+            type: object
+            $ref: '#/definitions/Sensor'
+        default:
+          description: Unexpected error
+          schema:
+            type: object
+            $ref: '#/definitions/Error'
+    put:
+      description: |
+        Updates a `Sensor` using a full object representation.
+      parameters:
+        - name: id
+          in: path
+          description: |
+            The ID of the `Sensor` to update.
+          required: true
+          type: integer
+          format: int32
+        - name: sensor
+          in: body
+          description: |
+            The full representation of the `Sensor` to update. All modifiable
+            fields are required. The request body must also contain the `key`
+            value for the `Zone` to which the `Sensor` belongs. If the `key` is
+            missing or invalid, an authorization error will occur.
+          schema:
+            title: Sensor
+            type: object
+            $ref: '#/definitions/Sensor'
+      responses:
+        '200':
+          description: |
+            The `Sensor` was updated successfully.
+          schema:
+            title: Sensor
+            type: object
+            $ref: '#/definitions/Sensor'
+        '403':
+          description: |
+            Authorization failed for the request. This will occur if the
+            request's `key` value is missing or invalid.
+          schema:
+            title: Error
+            type: object
+            $ref: '#/definitions/Error'
+        default:
+          description: An unexpected error occurred.
+          schema:
+            title: Error
+            type: object
+            $ref: '#/definitions/Error'
+    patch:
+      description: |
+        Updates a `Sensor` using a partial object representation.
+      parameters:
+        - name: id
+          in: path
+          description: |
+            The ID of the `Sensor` to update.
+          required: true
+          type: integer
+          format: int32
+        - name: sensor
+          in: body
+          description: |
+            A partial representation of the `Sensor` to update. The request
+            body must also contain the `key` value for the `Zone` to which the
+            `Sensor` belongs. If the `key` is missing or invalid, an
+            authorization error will occur.
+          schema:
+            title: Sensor
+            type: object
+            $ref: '#/definitions/Sensor'
+      responses:
+        '200':
+          description: |
+            The `Sensor` was updated successfully.
+          schema:
+            title: Sensor
+            type: object
+            $ref: '#/definitions/Sensor'
+        '403':
+          description: |
+            Authorization failed for the request. This will occur if the
+            request's `key` value is missing or invalid.
+          schema:
+            title: Error
+            type: object
+            $ref: '#/definitions/Error'
+        default:
+          description: An unexpected error occurred.
+          schema:
+            title: Error
+            type: object
+            $ref: '#/definitions/Error'
+    delete:
+      description: |
+        Deletes a `Sensor` object.
+      parameters:
+        - name: id
+          in: path
+          description: |
+            The ID of the `Sensor` to delete.
+          required: true
+          type: integer
+          format: int32
+        - name: key
+          in: body
+          description: |
+            The `key` of the `Zone` to which the `Sensor` belongs.
+          schema:
+            title: Key
+            type: object
+            $ref: '#/definitions/Key'
+      responses:
+        '204':
+          description: |
+            The `Sensor` was successfully deleted.
+        '403':
+          description: |
+            Authorization failed for the request. This will occur if the
+            request's `key` value is missing or invalid.
+          schema:
+            title: Error
+            type: object
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            type: object
+            $ref: '#/definitions/Error'
+  /api/v1/api/v1/data:
+    get:
+      description: |
+        Gets a collection of `SensorData` objects.
+      parameters:
+        - name: limit
+          in: query
+          description: |
+            The maximum number of elements to return in the result set.
+          required: false
+          type: integer
+          format: int32
+        - name: offset
+          in: query
+          description: |
+            The number of elements to skip before returning the result set.
+          required: false
+          type: integer
+          format: int32
+        - name: zone_ids
+          in: query
+          description: |
+            A comma-separated list of `Zone` IDs. If specified, only
+            `SensorData` objects associated with `Sensor`s that belong to the
+            specified `Zone`s will be included in the result set.
+          required: false
+          type: string
+        - name: sensor_ids
+          in: query
+          description: |
+            A comma-separated list of `Sensor` IDs. If specified, only
+            `SensorData` objects associated with matching `Sensor`s will be
+            included in the result set.
+          required: false
+          type: string
+        - name: start_date
+          in: query
+          description: |
+            An ISO 8601-formatted UTC date. If specified, only `SensorData`
+            objects whose `datetime` values are greater than or equal to
+            `start_date` will be included in the result set.
+          required: false
+          type: string
+          format: date-time
+        - name: end_date
+          in: query
+          description: |
+            An ISO 8601-formatted UTC date. If specified, only `SensorData`
+            objects whose `datetime` values are less than or equal to `end_date`
+            will be included in the result set.
+          required: false
+          type: string
+          format: date-time
+        - name: min_value
+          in: query
+          description: |
+            A minimum value in degrees Celsius. If specified, only `SensorData`
+            objects whose `value`s are greater than or equal to `min_value` will
+            be included in the result set.
+          required: false
+          type: number
+          format: decimal
+        - name: max_value
+          in: query
+          description: |
+            A minimum value in degrees Celsius. If specified, only `SensorData`
+            objects whose `value`s are greater than or equal to `max_value` will
+            be included in the result set.
+          required: false
+          type: number
+          format: decimal
+        - name: order_by
+          in: query
+          description: |
+            The field by which the result set will be ordered. To specify
+            descending order, prefix the field name with a hyphen (e.g., `-id`).
+            If this parameter is omitted, results will be sorted by their
+            `datetime` values in descending order.
+          required: false
+          type: string
+      tags:
+        - Sensors
+      responses:
+        '200':
+          description: An array of `SensorData` objects.
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/SensorData'
+        default:
+          description: Unexpected error
+          schema:
+            type: object
+            $ref: '#/definitions/Error'
+    post:
+      description: |
+        Creates a new `SensorData` object.
+      parameters:
+        - name: SensorData
+          in: body
+          description: |
+            The details of the `SensorData` object to create. The request body
+            must also contain the `key` value for the `Zone` to which the
+            `Sensor` belongs. If the `key` is missing or invalid, an
+            authorization error will occur.
+
+            If the associated `Sensor` does not yet exist, the new `Sensors`'s
+            `guid` value may be specified in the request body, and the `Sensor`
+            object will be created along with the `SensorData` object.
+          required: true
+          schema:
+            title: SensorData
+            type: object
+            $ref: '#/definitions/SensorData'
+      responses:
+        '201':
+          description: |
+            The `SensorData` object was created successfully.
+          schema:
+            title: SensorData
+            type: object
+            $ref: '#/definitions/SensorData'
+        '403':
+          description: |
+            Authorization failed for the request. This will occur if the
+            request's `key` value is missing or invalid.
+          schema:
+            title: Error
+            type: object
+            $ref: '#/definitions/Error'
+        default:
+          description: |
+            An unexpected error occurred.
+          schema:
+            title: Error
+            type: object
+            $ref: '#/definitions/Error'
+  /api/v1/data/{id}:
+    get:
+      description: |
+        Gets a `SensorData` object.
+      parameters:
+        - name: id
+          in: path
+          description: |
+            The ID of the `SensorData` object to get.
+          required: true
+          type: integer
+          format: int32
+      responses:
+        '200':
+          description: |
+            The `SensorData` object whose ID is `id`.
+          schema:
+            type: object
+            $ref: '#/definitions/SensorData'
+        default:
+          description: Unexpected error
+          schema:
+            type: object
+            $ref: '#/definitions/Error'
+definitions:
+  Zone:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int32
+        description: |
+          Read-only. The internal identifier for the `Zone`.
+      name:
+        type: string
+        description: |
+          The name of the `Zone`.
+      notes:
+        type: string
+        description: |
+          Optional, additional information for the `Zone`.
+  Sensor:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int32
+        description: Read-only. The internal identifier for the `Sensor`.
+      guid:
+        type: string
+        description: The device-defined identifier for the `Sensor`.
+      name:
+        type: string
+        description: |
+          The name of the `Sensor`. Defaults to the string representation of the
+          `guid` value.
+      notes:
+        type: string
+        description: |
+          Optional, additional information for the `Sensor`.
+      zone:
+        type: string
+        format: url
+        description: |
+          The absolute URL for the `Zone` to which the `Sensor` belongs.
+      min_value:
+        type: number
+        format: decimal
+        description: |
+          The minimum value of the alert-triggering value range.
+      max_value:
+        type: number
+        format: decimal
+        description: |
+          The maximum value of the alert-triggering value range.
+      min_value_operator:
+        type: string
+        description: |
+          The mathematical comparison operator for `min_value`. Must be one of
+          `<`, `>`, `<=`, or `>=`.
+      max_value_operator:
+        type: string
+        description: |
+          The mathematical comparison operator for `min_value`. Must be one of
+          `<`, `>`, `<=`, or `>=`.
+      state:
+        type: boolean
+        description: |
+          Read-only. `true` if the last value reported by the `Sensor` was in
+          the acceptable operating range.
+      state_last_change_date:
+        type: string
+        format: date-time
+        description: |
+          Read-only. The date and time of the `Sensor`'s last state change. This
+          value will always be in UTC and ISO 8601 format.
+  SensorData:
+    type: object
+    properties:
+      sensor:
+        type: string
+        format: url
+        description: |
+          The absolute URL for the `Sensor` to which the `SensorData` belongs.
+      value:
+        type: number
+        format: decimal
+        description: |
+          The temperature value of the data point in degrees Celsius.
+      datetime:
+        type: string
+        format: date-time
+        description: |
+          The date and time at which the data point was collected. This value
+          will always be in UTC and ISO 8601 format.
+      state:
+        type: boolean
+        description: |
+          `true` if the data point was in the `Sensor`'s acceptable operating
+          range. This value is set when the data point is created and may not
+          reflect the `Sensor`'s current `min_value` and `max_value` bounds.
+      state_changed:
+        type: boolean
+        description: |
+          `true` if the data point caused the `Sensor`'s state to change (from
+          `true` to `false` or vice versa).
+  Key:
+    type: object
+    properties:
+      key:
+        type: string
+        format: uuid4
+        description: |
+          The unique `key` for a `Zone`.
+  Error:
+    type: object
+    properties:
+      details:
+        type: string
+        description: |
+          A detailed description of the error.

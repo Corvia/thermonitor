@@ -42,3 +42,31 @@ chown -R vagrant:vagrant ${HOMEDIR}
 
 sudo ln -s /usr/bin/nodejs /usr/bin/node
 sudo npm install -g bower
+
+cd ${PROJECTDIR}
+bower install jquery bootstrap
+
+# Generate a random 32 character string
+POSTGRESQL_PASSWORD=$(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c${1:-32};echo;)
+
+# Generate a random 80 character string
+DJANGO_SECRET=$(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c${1:-80};echo;)
+
+# Set UTF-8, transaction options and timezone when creating the django database user
+# https://www.digitalocean.com/community/tutorials/how-to-use-postgresql-with-your-django-application-on-ubuntu-14-04
+echo "CREATE DATABASE djthermonitor;
+CREATE USER djthermonitor WITH PASSWORD '$POSTGRESQL_PASSWORD';
+ALTER ROLE djthermonitor SET client_encoding TO 'utf8';
+ALTER ROLE djthermonitor SET default_transaction_isolation TO 'read committed';
+GRANT ALL PRIVILEGES ON DATABASE djthermonitor TO djthermonitor;
+" | sudo -u postgres psql
+
+cp djthermonitor/settings_local_default.py djthermonitor/settings_local.py
+sed -i -- "s/@@@@POSTGRESQL_PASSWORD@@@@/$POSTGRESQL_PASSWORD/g" djthermonitor/settings_local.py
+sed -i -- "s/@@@@DJANGO_SECRET@@@@/$DJANGO_SECRET/g" djthermonitor/settings_local.py
+
+manage.py migrate
+
+POSTGRESQL_PASSWORD=""
+DJANGO_SECRET=""
+
