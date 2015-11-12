@@ -65,7 +65,7 @@ cp djthermonitor/settings_local_default.py djthermonitor/settings_local.py
 sed -i -- "s/@@@@POSTGRESQL_PASSWORD@@@@/$POSTGRESQL_PASSWORD/g" djthermonitor/settings_local.py
 sed -i -- "s/@@@@DJANGO_SECRET@@@@/$DJANGO_SECRET/g" djthermonitor/settings_local.py
 
-manage.py migrate
+./manage.py migrate
 
 POSTGRESQL_PASSWORD=""
 DJANGO_SECRET=""
