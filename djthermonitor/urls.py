@@ -26,4 +26,5 @@ urlpatterns = [
     url(r'^$', TemplateView.as_view(template_name='frontpage.html'), name='frontpage'),
     url(r'^api/v1/', include(router.urls, namespace='v1')),
     url(r'^admin/', include(admin.site.urls)),
+    url(r'^robots\.txt/$', TemplateView.as_view(template_name='robots.txt', content_type='text/plain')),
 ]

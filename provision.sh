@@ -44,7 +44,7 @@ sudo ln -s /usr/bin/nodejs /usr/bin/node
 sudo npm install -g bower
 
 cd ${PROJECTDIR}
-bower install jquery bootstrap
+bower install
 
 # Generate a random 32 character string
 POSTGRESQL_PASSWORD=$(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c${1:-32};echo;)
@@ -65,7 +65,7 @@ cp djthermonitor/settings_local_default.py djthermonitor/settings_local.py
 sed -i -- "s/@@@@POSTGRESQL_PASSWORD@@@@/$POSTGRESQL_PASSWORD/g" djthermonitor/settings_local.py
 sed -i -- "s/@@@@DJANGO_SECRET@@@@/$DJANGO_SECRET/g" djthermonitor/settings_local.py
 
-manage.py migrate
+./manage.py migrate
 
 POSTGRESQL_PASSWORD=""
 DJANGO_SECRET=""
