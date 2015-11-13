@@ -44,6 +44,7 @@ sudo ln -s /usr/bin/nodejs /usr/bin/node
 sudo npm install -g bower
 
 cd ${PROJECTDIR}
+npm install
 bower install
 
 # Generate a random 32 character string
