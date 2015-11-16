@@ -104,19 +104,25 @@ STATICFILES_DIRS = (
 # Example: "/home/media/media.lawrence.com/static/"
 STATIC_ROOT = os.path.join(BASE_DIR, 'static_compiled')
 
-# As suggested by ./manage check --deploy
-CSRF_COOKIE_SECURE = True
-CSRF_COOKIE_HTTPONLY = True
-SESSION_COOKIE_SECURE = True
-SECURE_BROWSER_XSS_FILTER = True
-SECURE_CONTENT_TYPE_NOSNIFF = True
-#SECURE_SSL_REDIRECT = True # Enabling this one causes a redirect loop.
-X_FRAME_OPTIONS = "DENY"
+# Allow URL resolver to automatically assume we want to add a slash
+# if it doesn't find anything in urls.py.
 APPEND_SLASH = True
 
 
-
+# Load local configuration settings
 try:
     from settings_local import *
 except ImportError:
     pass
+
+# These security related items cause issues in local development environments,
+# mostly because we don't have SSL certificates locally.
+if not DEBUG:
+    # As suggested by ./manage check --deploy
+    CSRF_COOKIE_SECURE = True
+    CSRF_COOKIE_HTTPONLY = True
+    SESSION_COOKIE_SECURE = True
+    SECURE_BROWSER_XSS_FILTER = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    #SECURE_SSL_REDIRECT = True # Enabling this one causes a redirect loop.
+X_FRAME_OPTIONS = "DENY"
