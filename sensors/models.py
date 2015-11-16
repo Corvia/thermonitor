@@ -199,7 +199,8 @@ class Sensor(models.Model):
     def latest_value(self):
         """Get the most recent `SensorData` value reported by this `Sensor`."""
         try:
-            return SensorData.objects.filter(sensor=self).order_by('-datetime').first().value
+            sensor_data = SensorData.objects.filter(sensor=self).order_by('-datetime').first()
+            return None if sensor_data is None else sensor_data.value
         except SensorData.DoesNotExist:
             return None
 
