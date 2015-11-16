@@ -224,6 +224,11 @@ class SensorDataViewSet(mixins.CreateModelMixin,
 
         if 'order_by' in request.GET:
             queryset = queryset.order_by(request.GET['order_by'])
+        # For CSV downloads, if the manual order_by argument is not sent
+        # let's just assume user wants to group by sensor and then order those
+        # by descending datetime.
+        elif 'format' in request.GET and request.GET['format'] == "csv":
+            queryset = queryset.order_by('sensor', '-datetime')
         else:
             queryset = queryset.order_by('-datetime')
 
