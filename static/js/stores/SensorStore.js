@@ -46,7 +46,7 @@ var SensorStore = assign({}, EventEmitter.prototype, {
             if (!sensor ||
                 !sensor.hasOwnProperty('zone') ||
                 typeof sensor.zone !== 'string') {
-                return null;
+                    return null;
             }
             return parseInt(sensor.zone.split('/')
                 .filter(function(e) { return !!e; })

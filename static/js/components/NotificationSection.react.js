@@ -1,18 +1,18 @@
-var Notification = require('./Notification.react')
+var Alert = require('./Alert.react')
 var React = require('react');
 
 var NotificationSection = React.createClass({
     render: function() {
-        var notificationNodes = [];
-        for (var notificationId in this.props.notifications) {
-            var notification = this.props.notifications[notificationId];
-            notificationNodes.push(<Notification key={notification.id} notification={notification} />);
+        var alertNodes = [];
+        for (var alertId in this.props.alerts) {
+            var alert = this.props.alerts[alertId];
+            alertNodes.push(<Alert key={alert.id} alert={alert} />);
         }
         return (
             <div className="container notifications">
                 <h2>Notification Activity</h2>
                 <hr />
-                {notificationNodes}
+                {alertNodes}
             </div>
         );
     }

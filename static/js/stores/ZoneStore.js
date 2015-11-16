@@ -27,7 +27,7 @@ var ZoneStore = assign({}, EventEmitter.prototype, {
      */
     getFilteredZones: function(filters) {
         if (!filters || !filters.hasOwnProperty('zoneIds')) {
-                return _sensors;
+            return _sensors;
         }
 
         var isExcludedByZoneIdsFilter;
@@ -48,10 +48,10 @@ var ZoneStore = assign({}, EventEmitter.prototype, {
         for (var zoneId in _zones) {
             var zone = _zones[zoneId];
             if (isExcludedByZoneIdsFilter(zone)) {
-                    continue;
+                continue;
             }
 
-            result[zone.id] == zone;
+            result[zone.id] = zone;
         }
 
         return result;
@@ -70,7 +70,7 @@ var ZoneStore = assign({}, EventEmitter.prototype, {
      *      store's Sensor object representations.
      */
     getPagedZones: function(limit, offset, filters) {
-        var filteredZones = filters ?this.getFilteredZones(filters) : _zones;
+        var filteredZones = filters ? this.getFilteredZones(filters) : _zones;
 
         var result = {};
         var counter = 0;
