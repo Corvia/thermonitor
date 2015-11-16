@@ -9,7 +9,7 @@ from rest_framework.response import Response
 from rest_framework.reverse import reverse
 from sensors.models import Sensor, SensorData, Zone
 from sensors.serializers import (
-    SensorSerializer, SensorDataSerializer, ZoneSerializer)
+    SensorSerializer, SensorDataSerializer, SensorDataSerializerCSV, ZoneSerializer)
 
 def _raise_zone_key_auth_failed():
     """Raise a `AuthenticationFailed` exception for a zone key auth failure."""
@@ -231,6 +231,14 @@ class SensorDataViewSet(mixins.CreateModelMixin,
             queryset = queryset.order_by('sensor', '-datetime')
         else:
             queryset = queryset.order_by('-datetime')
+
+        # Use the special Sensor Serializer for CSV's here to remove a few
+        # extra fields.
+        if 'format' in request.GET and request.GET['format'] == "csv":
+            serializer = SensorDataSerializerCSV(queryset,
+                many=True,
+                context={'request': request})
+            return Response(serializer.data)
 
         page = self.paginate_queryset(queryset)
         if page is not None:

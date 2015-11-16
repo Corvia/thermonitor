@@ -631,9 +631,9 @@ class TestSensorsApi(object):
         num_lines = 0
         for line in reader:
             num_lines = num_lines + 1
-            # All lines should contain 7 fields
-            # datetime,id,sensor,sensor_name,state,state_changed,value
-            assert len(line) == 7
+            # All lines should contain 4 fields
+            # datetime,sensor_name,state,value
+            assert len(line) == 4
 
         # Should expect 3 lines of data and 1 header line == 4
         assert num_lines == 4
