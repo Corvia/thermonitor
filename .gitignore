@@ -5,6 +5,7 @@
 static/vendor/*
 settings_local.py
 node_modules
+npm-debug.*
 bundle.js
 bundle.min.js
 
