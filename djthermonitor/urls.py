@@ -16,10 +16,12 @@ Including another URLconf
 from django.conf.urls import include, url
 from django.contrib import admin
 from django.views.generic import TemplateView
+from notifications import urls as notification_urls
 from rest_framework import routers
 from sensors import urls as sensor_urls
 
 router = routers.DefaultRouter()
+notification_urls.register_api_routes(router)
 sensor_urls.register_api_routes(router)
 
 urlpatterns = [

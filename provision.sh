@@ -9,10 +9,14 @@ PROJECTDIR="${HOMEDIR}${PROJECTNAME}/"
 sudo apt-get update
 
 sudo apt-get install -y debconf-utils pkg-config python-software-properties
-sudo apt-get install -y apache2-utils git-core lynx mytop nginx nmap rdiff-backup s3cmd wget webalizer nodejs npm
+sudo apt-get install -y apache2-utils git-core lynx mytop nginx nmap rdiff-backup s3cmd wget webalizer
 sudo apt-get install -y graphviz graphviz-dev libgraphviz-dev libjpeg-dev libjpeg62
 sudo apt-get install -y python-dev python-pip python-imaging libfreetype6 libfreetype6-dev libpq-dev
 sudo apt-get install -y postgresql postgresql-contrib
+
+curl -sL https://deb.nodesource.com/setup_5.x | sudo -E bash -
+sudo apt-get install --yes nodejs
+sudo ln -s /usr/bin/nodejs /usr/bin/node
 
 sudo debconf-set-selections <<< "postfix postfix/mailname string ${HOSTNAME}"
 sudo debconf-set-selections <<< "postfix postfix/main_mailer_type string 'Internet Site'"
@@ -40,10 +44,10 @@ echo "cd ~/thermonitor" >> ~/.profile
 
 chown -R vagrant:vagrant ${HOMEDIR}
 
-sudo ln -s /usr/bin/nodejs /usr/bin/node
 sudo npm install -g bower
 
 cd ${PROJECTDIR}
+npm install
 bower install
 
 # Generate a random 32 character string

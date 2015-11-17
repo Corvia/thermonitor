@@ -1,0 +1,43 @@
+{
+    "name": "thermonitor",
+    "version": "0.0.1",
+    "description": "The Thermonitor UI",
+    "homepage": "https://github.com/Corvia/thermonitor",
+    "repository": "https://github.com/Corvia/thermonitor.git",
+    "bugs": "https://github.com/Corvia/thermonitor/issues",
+    "license": "CC-BY-SA-4.0",
+    "main": "static/js/app.js",
+    "dependencies": {
+        "classnames": "latest",
+        "es6-promise": "latest",
+        "flux": "latest",
+        "keymirror": "latest",
+        "moment": "latest",
+        "object-assign": "latest",
+        "react": "latest",
+        "react-dom": "latest"
+    },
+    "devDependencies": {
+        "browserify": "latest",
+        "envify": "latest",
+        "jest-cli": "latest",
+        "reactify": "latest",
+        "uglify-js": "latest",
+        "watchify": "latest"
+    },
+    "scripts": {
+        "start": "watchify -o static/js/bundle.js -v -d static/js/app.js",
+        "build": "browserify . -t [envify --NODE_ENV production] | uglifyjs -cm > static/js/bundle.min.js",
+        "test": "jest"
+    },
+    "author": "RP Nutrients, Inc.",
+    "browserify": {
+        "transform": [
+            "reactify",
+            "envify"
+        ]
+    },
+    "jest": {
+        "rootDir": "./static/js"
+    }
+}
