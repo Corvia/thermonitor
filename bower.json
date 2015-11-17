@@ -1,0 +1,23 @@
+{
+  "name": "thermonitor",
+  "homepage": "https://github.com/Corvia/thermonitor",
+  "description": "",
+  "main": "",
+  "moduleType": [
+    "globals"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "static/vendor",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "3.3.5",
+    "jquery": "2.1.4"
+  }
+}
