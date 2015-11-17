@@ -1,17 +1,5 @@
 """Contains functions for testing the functionality of the Sensors API."""
 
-# Initialize Django
-# http://stackoverflow.com/a/11158224
-import inspect, os, sys
-cwd = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-parentdir = os.path.dirname(cwd)
-sys.path.insert(0, parentdir)
-
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "djthermonitor.settings")
-from django.core.management import execute_from_command_line
-execute_from_command_line([''])
-# End Django initialization
-
 import json
 import csv
 import pytest
@@ -91,6 +79,7 @@ class TestSensorsApi(object):
         assert str(sensor.guid) == sensor_json['guid']
         assert sensor.name == sensor_json['name']
         assert sensor.notes == sensor_json['notes']
+        assert sensor.latest_value == sensor_json['latest_value']
         assert sensor.min_value == Decimal(sensor_json['min_value'])
         assert sensor.max_value == Decimal(sensor_json['max_value'])
         assert sensor.min_value_operator == sensor_json['min_value_operator']

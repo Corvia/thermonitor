@@ -20,9 +20,9 @@ class SensorSerializer(serializers.HyperlinkedModelSerializer):
         """Contains metadata for the DRF `Sensor` serializer class."""
         model = Sensor
         fields = ('id', 'guid', 'name', 'notes', 'state',
-            'state_last_change_date', 'zone', 'min_value', 'max_value',
-            'min_value_operator', 'max_value_operator')
-        read_only_fields = ('state', 'state_last_change_date')
+            'state_last_change_date', 'zone', 'latest_value', 'min_value',
+            'max_value', 'min_value_operator', 'max_value_operator')
+        read_only_fields = ('state', 'state_last_change_date', 'latest_value')
 
 class SensorDataSerializer(serializers.HyperlinkedModelSerializer):
     """A DRF serializer for `SensorData` objects."""
