@@ -20,11 +20,10 @@ class TestSensorsApi(object):
     alerts = None
 
     @pytest.fixture(autouse=True)
-    def api_root(self, request):
-        server = pytest.config.getoption('--server')
+    def api_root(self, request, live_server):
         api_root = '{}{}api/v1/'.format(
-            server,
-            '/' if not server.endswith('/') else '')
+            live_server.url,
+            '/' if not live_server.url.endswith('/') else '')
         return api_root
 
     @pytest.fixture(autouse=True)
