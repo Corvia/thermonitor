@@ -8,17 +8,25 @@ var Notification = React.createClass({
         var timeString = datetime.format('h:mm a')
         var relativeTimeString = datetime.fromNow();
 
-        var alertClass = '';
-        switch (this.props.alert.alert_class.toLowerCase()) {
-            case 'email':
-                alertClass = 'an email';
-                break;
+        var recipientsDiv = null;
+        if (this.props.alert.recipients) {
+            var alertClass = '';
+            switch (this.props.alert.alert_class.toLowerCase()) {
+                case 'email':
+                    alertClass = 'an email';
+                    break;
+            }
+
+            recipientsDiv = <div className="col-md-8"><span className="bright">{this.props.alert.message}</span> <span className="mute">{alertClass} has been sent to</span> {this.props.alert.recipients}</div>
+        }
+        else {
+            recipientsDiv = <div className="col-md-8"><span className="bright">{this.props.alert.message}</span></div>
         }
 
         return (
             <div className="row">
                 <div className="col-md-2 datetime">{dateString} <span className="mute">@</span> {timeString}</div>
-                <div className="col-md-8"><span className="bright">{this.props.alert.message}</span> <span className="mute">{alertClass} has been sent to</span> {this.props.alert.recipients}</div>
+                {recipientsDiv}
                 <div className="col-md-2 mute">{relativeTimeString}</div>
             </div>
         );

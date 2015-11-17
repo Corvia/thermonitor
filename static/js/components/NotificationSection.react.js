@@ -8,6 +8,11 @@ var NotificationSection = React.createClass({
             var alert = this.props.alerts[alertId];
             alertNodes.push(<Alert key={alert.id} alert={alert} />);
         }
+
+        if (alertNodes.length === 0) {
+            alertNodes = <div>No notifications have been sent.</div>
+        }
+
         return (
             <div className="container notifications">
                 <h2>Notification Activity</h2>

@@ -8,6 +8,11 @@ var ZoneSection = React.createClass({
             var zone = this.props.zones[zoneId];
             zoneNodes.push(<Zone key={zone.id} zone={zone} />);
         }
+
+        if (zoneNodes.length === 0) {
+            zoneNodes = <h2>No zones have been added.</h2>
+        }
+
         return (
             <div className="zoneSection container">
                 {zoneNodes}
