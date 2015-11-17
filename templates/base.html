@@ -27,6 +27,10 @@
 
     <script src="{% static 'vendor/jquery/dist/jquery.min.js' %}"></script>
     <script src="{% static 'vendor/bootstrap/dist/js/bootstrap.min.js' %}"></script>
-    <script src="{% static 'js/bundle.js' %}"></script>
+    {% if settings.DEBUG %}
+      <script src="{% static 'js/bundle.js' %}"></script>
+    {% else %}
+      <script src="{% static 'js/bundle.min.js' %}"></script>
+    {% endif %}
   </body>
 </html>
