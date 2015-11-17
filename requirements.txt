@@ -9,6 +9,7 @@ django-debug-toolbar
 django-extensions
 django-smtp-ssl
 djangorestframework
+djangorestframework-csv
 docutils
 Fabric
 gunicorn

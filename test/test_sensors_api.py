@@ -1,12 +1,14 @@
 """Contains functions for testing the functionality of the Sensors API."""
 
 import json
+import csv
 import pytest
 import re
 import requests
 from datetime import datetime
 from decimal import Decimal
 from sensors.models import Sensor, SensorData, Zone
+from StringIO import StringIO
 from uuid import uuid4
 
 @pytest.mark.django_db
@@ -608,6 +610,22 @@ class TestSensorsApi(object):
 
         data_json = [x for x in data if int(x['id']) == self.data[0].id][0]
         self._compare_sensor_data_json(self.data[0], data_json)
+
+    def test_sensor_data_list_get_csv(self, api_root):
+        suffix = 'data/?zone_ids={}&format=csv'.format(
+            self.zone.id
+        )
+        response = requests.get(api_root + suffix)
+        reader = csv.reader(StringIO(response.text))
+        num_lines = 0
+        for line in reader:
+            num_lines = num_lines + 1
+            # All lines should contain 4 fields
+            # datetime,sensor_name,state,value
+            assert len(line) == 4
+
+        # Should expect 3 lines of data and 1 header line == 4
+        assert num_lines == 4
 
     def test_sensor_data_list_post(self, api_root):
         data_dict = {

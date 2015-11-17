@@ -43,11 +43,21 @@ class SensorDataSerializer(serializers.HyperlinkedModelSerializer):
 
         return super(SensorDataSerializer, self).create(validated_data)
 
+    sensor_name = serializers.CharField(source="sensor.name", read_only=True)
+
     class Meta:
         """Contains metadata for the DRF `SensorData` serializer class."""
         model = SensorData
-        fields = ('id', 'datetime', 'value', 'sensor', 'state', 'state_changed')
+        fields = ('id', 'datetime', 'sensor_name', 'value', 'sensor', 'state', 'state_changed')
         read_only_fields = ('state', 'state_changed')
+
+class SensorDataSerializerCSV(SensorDataSerializer):
+    """ A DEF serializer for `SensorData` objects. Used to be a bit more specific with the CSV response. """
+    class Meta:
+        model = SensorData
+        fields = ('datetime', 'sensor_name', 'value', 'state')
+        read_only_fields = ('state', 'state_changed')
+
 
 class ZoneSerializer(serializers.HyperlinkedModelSerializer):
     """A DRF serializer for `Zone` objects."""
