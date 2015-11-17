@@ -9,6 +9,7 @@ from decimal import Decimal
 from django.contrib.auth.models import Group, User
 from notifications.models import SensorAlert, SensorAlertGroup
 from sensors.models import Sensor, SensorData, Zone
+from django.core import mail
 from uuid import uuid4
 
 class TestSensorsApi(object):
@@ -20,11 +21,10 @@ class TestSensorsApi(object):
     alerts = None
 
     @pytest.fixture(autouse=True)
-    def api_root(self, request):
-        server = pytest.config.getoption('--server')
+    def api_root(self, request, live_server):
         api_root = '{}{}api/v1/'.format(
-            server,
-            '/' if not server.endswith('/') else '')
+            live_server.url,
+            '/' if not live_server.url.endswith('/') else '')
         return api_root
 
     @pytest.fixture(autouse=True)
@@ -83,6 +83,10 @@ class TestSensorsApi(object):
         self.sensor.alert_groups.add(self.alert_group)
 
         self.data = []
+
+        # Inbox is empty
+        assert 0 == len(mail.outbox)
+
         # Create in-range data point; no notification.
         datum = SensorData(sensor=self.sensor,
             datetime=datetime.utcnow(),
@@ -91,6 +95,9 @@ class TestSensorsApi(object):
             state_changed=False)
         datum.save()
         self.data.append(datum)
+
+        # Inbox still empty
+        assert 0 == len(mail.outbox)
 
         # Create out-of-range notification; sends "alert."
         datum = SensorData(sensor=self.sensor,
@@ -101,6 +108,9 @@ class TestSensorsApi(object):
         datum.save()
         self.data.append(datum)
 
+        # Inbox received alert
+        assert 1 == len(mail.outbox)
+
         # Create another in-range data point; sends "recovered."
         datum = SensorData(sensor=self.sensor,
             datetime=datetime.utcnow(),
@@ -109,6 +119,9 @@ class TestSensorsApi(object):
             state_changed=False)
         datum.save()
         self.data.append(datum)
+
+        # Inbox received recovery email
+        assert 2 == len(mail.outbox)
 
         self.alerts = SensorAlert.objects.all().order_by('id')
 

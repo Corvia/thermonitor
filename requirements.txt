@@ -15,6 +15,7 @@ Fabric
 gunicorn
 psycopg2
 pytest
+pytest-django
 raven
 requests
 

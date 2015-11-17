@@ -114,6 +114,13 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static_compiled')
 # if it doesn't find anything in urls.py.
 APPEND_SLASH = True
 
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+    }
+}
+DEFAULT_INDEX_TABLESPACE = ''
+
 
 # Load local configuration settings
 try:
