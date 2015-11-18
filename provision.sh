@@ -45,6 +45,9 @@ echo "cd ~/thermonitor" >> ~/.profile
 chown -R vagrant:vagrant ${HOMEDIR}
 
 sudo npm install -g bower
+sudo npm install -g browserify
+sudo npm install -g uglify-js
+sudo npm install -g envify
 
 cd ${PROJECTDIR}
 npm install
