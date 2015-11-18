@@ -12,11 +12,11 @@ class Email(BaseAlert):
     def alert(self):
         self.subject = ("%s Temperature Alert - %s 'F" %
                         (self.sensor.name, self.sensor_data.value_f()))
-        
+
         msg = "Please check {0} at {1}, temperature monitoring reports %s 'F."
         self.message = msg.format(
-            self.sensor.name, 
-            self.sensor.zone.name, 
+            self.sensor.name,
+            self.sensor.zone.name,
             self.sensor_data.value_f()
         )
 
