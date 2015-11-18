@@ -35,7 +35,7 @@ def sensor_data_process(sender, instance, *args, **kwargs):
 
     if sensor.state != state:
         sensor.state = state
-        sensor.state_last_change_date = datetime.now()
+        sensor.state_last_change_date = datetime.utcnow()
         sensor.save()
         instance.state_changed = True
 
