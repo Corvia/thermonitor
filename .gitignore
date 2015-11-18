@@ -8,6 +8,7 @@ node_modules
 npm-debug.*
 bundle.js
 bundle.min.js
+static_compiled/
 
 # pytest litter
 */.cache/*
