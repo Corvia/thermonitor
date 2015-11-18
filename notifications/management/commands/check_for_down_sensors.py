@@ -1,22 +1,24 @@
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 from sensors.models import Sensor, SensorData
 from django.conf import settings
 from datetime import datetime, timedelta
 from django.utils import timezone
 from notifications.apps.utils import send_notification
 
-"""
-Cron script for checking for down sensors.
-
-Sends out notifications based on inactive hosts and the settings.SENSOR_DOWN_AFTER_MINUTES
-varirable.
-
-Here's the crontab config. Adjust the minutes as necessary, this checks every 15 minutes:
-
-*/15 * * * * cd /home/vagrant/thermonitor; /home/vagrant/.virtualenvs/thermonitor/bin/python manage.py check_for_down_sensors >/dev/null 2>&1
-"""
 
 class Command(BaseCommand):
+    """
+    Cron script for checking for down sensors.
+
+    Sends out notifications based on inactive hosts and the
+    settings.SENSOR_DOWN_AFTER_MINUTES varirable.
+
+    Here's the crontab config. Adjust the minutes as necessary, this checks every 15 minutes:
+
+    */15 * * * *  cd /home/user/thermonitor; \
+         /path/to/virtualenv/bin/python manage.py check_for_down_sensors >/dev/null 2>&1
+
+    """
     help = 'Checks for Down or Inactive Sensors'
 
     def handle(self, *args, **options):
@@ -28,9 +30,12 @@ class Command(BaseCommand):
             # Get last sensor data entry
             data = SensorData.objects.filter(sensor=sensor).order_by("-datetime")[0:1]
 
-            old_before_datetime = timezone.make_aware(datetime.now()) - timedelta(minutes=settings.SENSOR_DOWN_AFTER_MINUTES)
+            nowtz = timezone.make_aware(datetime.now())
+            delta = timedelta(minutes=settings.SENSOR_DOWN_AFTER_MINUTES)
+
+            old_before_datetime = nowtz - delta
             if data and data[0]:
-                since =  str(data[0].datetime)
+                since = str(data[0].datetime)
             else:
                 since = "???"
 

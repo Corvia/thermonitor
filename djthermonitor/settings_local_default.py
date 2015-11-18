@@ -12,36 +12,31 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DEBUG = False
 
 
-"""
-Notification apps are located in notifications/apps/. Each app has some 
-additional configuration options (for example, email From: address for 
-the emails).
-"""
+# Notification apps are located in notifications/apps/. Each app has some
+# additional configuration options (for example, email From: address for
+# the emails).
 NOTIFICATIONS = {
     'Email': {
         'FROM_ADDRESS': 'Thermonitor <thermonitor@rpnutrients.com>',
     },
-    #'twilio-text' = {},
-    #'square-pos' = {},
-    #'slack' = {},
+    # 'twilio-text' = {},
+    # 'square-pos' = {},
+    # 'slack' = {},
 }
 
 
-"""
-The number of minutes we should wait until we send a notification that
-the sensor hasn't checked in for awhile.
-"""
+# The number of minutes we should wait until we send a notification that
+# the sensor hasn't checked in for awhile.
 SENSOR_DOWN_AFTER_MINUTES = 30
 
 
 # Database
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
-
 DATABASES = {
-    #'default': {
+    # 'default': {
     #    'ENGINE': 'django.db.backends.sqlite3',
     #    'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    #}
+    # }
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'djthermonitor',
@@ -52,16 +47,14 @@ DATABASES = {
     }
 }
 
-
 SECRET_KEY = '@@@@DJANGO_SECRET@@@@'
 
 # Amazon SES
 DEFAULT_FROM_EMAIL = "webmaster@corviatech.com"
 SERVER_EMAIL = "webmaster@corviatech.com"
-#EMAIL_BACKEND = 'django_smtp_ssl.SSLEmailBackend'
-#EMAIL_HOST = 'email-smtp.us-east-1.amazonaws.com'
-#EMAIL_PORT = 465
-#EMAIL_HOST_USER = 'my_smtp_username'
-#EMAIL_HOST_PASSWORD = 'my_smtp_password'
-#EMAIL_USE_TLS = True
-
+# EMAIL_BACKEND = 'django_smtp_ssl.SSLEmailBackend'
+# EMAIL_HOST = 'email-smtp.us-east-1.amazonaws.com'
+# EMAIL_PORT = 465
+# EMAIL_HOST_USER = 'my_smtp_username'
+# EMAIL_HOST_PASSWORD = 'my_smtp_password'
+# EMAIL_USE_TLS = True

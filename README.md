@@ -41,6 +41,11 @@ Tests are located in the `test` directory and can be run with `pytest`, e.g.,
 
     $ py.test -v
 
+We use the flake8 python package to check for syntax errors and enforcing 
+PEP 8 python coding conventions.
+
+    $ flake8
+
 ## Build Process
 ### Front End
 As mentioned above, the front end is built using React and transformed ahead of

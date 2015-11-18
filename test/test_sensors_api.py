@@ -11,6 +11,7 @@ from sensors.models import Sensor, SensorData, Zone
 from StringIO import StringIO
 from uuid import uuid4
 
+
 @pytest.mark.django_db
 class TestSensorsApi(object):
     zone = None
@@ -40,30 +41,36 @@ class TestSensorsApi(object):
                 self.zone.delete()
                 self.zone = None
 
-        self.zone = Zone(name='Test Zone',
+        self.zone = Zone(
+            name='Test Zone',
             notes='Zone notes.',
-            key=uuid4())
+            key=uuid4()
+        )
         self.zone.save()
 
-        self.sensor = Sensor(guid=uuid4(),
+        self.sensor = Sensor(
+            guid=uuid4(),
             name='Test Sensor',
             notes='Sensor notes.',
-            zone = self.zone,
+            zone=self.zone,
             min_value=20,
             max_value=25,
             min_value_operator='>=',
             max_value_operator='<=',
             state=True,
-            state_last_change_date=datetime.utcnow())
+            state_last_change_date=datetime.utcnow()
+        )
         self.sensor.save()
 
         self.data = []
         for i in range(3):
-            datum = SensorData(sensor=self.sensor,
+            datum = SensorData(
+                sensor=self.sensor,
                 datetime=datetime.utcnow(),
                 value=self.sensor.min_value + i,
                 state=True,
-                state_changed=False)
+                state_changed=False
+            )
             datum.save()
             self.data.append(datum)
 
@@ -145,16 +152,18 @@ class TestSensorsApi(object):
         # checked, and the json is already being checked elsewhere anyway. -ajm
 
     def test_sensors_list_get_with_sensor_filter(self, api_root):
-        excluded_sensor = Sensor(guid=uuid4(),
+        excluded_sensor = Sensor(
+            guid=uuid4(),
             name='Test Sensor Excluded',
             notes='Sensor notes.',
-            zone = self.zone,
+            zone=self.zone,
             min_value=20,
             max_value=25,
             min_value_operator='>=',
             max_value_operator='<=',
             state=True,
-            state_last_change_date=datetime.utcnow())
+            state_last_change_date=datetime.utcnow()
+        )
         excluded_sensor.save()
 
         suffix = 'sensors/?sensor_ids={}&format=json'.format(self.sensor.id)
@@ -171,21 +180,25 @@ class TestSensorsApi(object):
         self._compare_sensor_json(self.sensor, sensor_json)
 
     def test_sensors_list_get_with_zone_filter(self, api_root):
-        excluded_zone = Zone(name='Test Zone Excluded',
+        excluded_zone = Zone(
+            name='Test Zone Excluded',
             notes='Zone notes.',
-            key=uuid4())
+            key=uuid4()
+        )
         excluded_zone.save()
 
-        excluded_sensor = Sensor(guid=uuid4(),
+        excluded_sensor = Sensor(
+            guid=uuid4(),
             name='Test Sensor Excluded',
             notes='Sensor notes.',
-            zone = excluded_zone,
+            zone=excluded_zone,
             min_value=20,
             max_value=25,
             min_value_operator='>=',
             max_value_operator='<=',
             state=True,
-            state_last_change_date=datetime.utcnow())
+            state_last_change_date=datetime.utcnow()
+        )
         excluded_sensor.save()
 
         suffix = 'sensors/?zone_ids={}&format=json'.format(self.sensor.zone.id)
@@ -203,16 +216,18 @@ class TestSensorsApi(object):
         self._compare_sensor_json(self.sensor, sensor_json)
 
     def test_sensors_list_get_with_order_by(self, api_root):
-        second_sensor = Sensor(guid=uuid4(),
-            name=self.sensor.name + '_', # Just something to make it sort lower
+        second_sensor = Sensor(
+            guid=uuid4(),
+            name=self.sensor.name + '_',  # Just something to make it sort lower
             notes='Sensor notes.',
-            zone = self.zone,
+            zone=self.zone,
             min_value=20,
             max_value=25,
             min_value_operator='>=',
             max_value_operator='<=',
             state=True,
-            state_last_change_date=datetime.utcnow())
+            state_last_change_date=datetime.utcnow()
+        )
         second_sensor.save()
 
         # Sort by name, ascending
@@ -259,9 +274,11 @@ class TestSensorsApi(object):
             'key': str(self.zone.key)
         }
         headers = {'Content-type': 'application/json'}
-        response = requests.post(api_root + 'sensors/',
+        response = requests.post(
+            api_root + 'sensors/',
             data=json.dumps(sensor_dict),
-            headers=headers)
+            headers=headers
+        )
 
         data = response.json()
 
@@ -286,9 +303,11 @@ class TestSensorsApi(object):
             'key': str(self.zone.key)
         }
         headers = {'Content-type': 'application/json'}
-        response = requests.post(api_root + 'sensors/',
+        response = requests.post(
+            api_root + 'sensors/',
             data=json.dumps(sensor_dict),
-            headers=headers)
+            headers=headers
+        )
 
         # Attempt to remove the object if it's erroneously created.
         try:
@@ -311,9 +330,11 @@ class TestSensorsApi(object):
             'max_value_operator': '<='
         }
         headers = {'Content-type': 'application/json'}
-        response = requests.post(api_root + 'sensors/',
+        response = requests.post(
+            api_root + 'sensors/',
             data=json.dumps(sensor_dict),
-            headers=headers)
+            headers=headers
+        )
 
         # Attempt to remove the object if it's erroneously created.
         try:
@@ -362,9 +383,11 @@ class TestSensorsApi(object):
             'key': str(self.zone.key)
         }
         headers = {'Content-type': 'application/json'}
-        response = requests.put(api_root + suffix,
+        response = requests.put(
+            api_root + suffix,
             data=json.dumps(sensor_dict),
-            headers=headers)
+            headers=headers
+        )
 
         assert response.status_code == 200
         data = response.json()
@@ -391,9 +414,11 @@ class TestSensorsApi(object):
             'max_value_operator': '>='
         }
         headers = {'Content-type': 'application/json'}
-        response = requests.put(api_root + suffix,
+        response = requests.put(
+            api_root + suffix,
             data=json.dumps(sensor_dict),
-            headers=headers)
+            headers=headers
+        )
 
         assert response.status_code == 403
 
@@ -411,9 +436,11 @@ class TestSensorsApi(object):
             'key': str(self.zone.key)
         }
         headers = {'Content-type': 'application/json'}
-        response = requests.put(api_root + suffix,
+        response = requests.put(
+            api_root + suffix,
             data=json.dumps(sensor_dict),
-            headers=headers)
+            headers=headers
+        )
 
         assert response.status_code == 400
 
@@ -428,9 +455,11 @@ class TestSensorsApi(object):
             'key': str(self.zone.key)
         }
         headers = {'Content-type': 'application/json'}
-        response = requests.patch(api_root + suffix,
+        response = requests.patch(
+            api_root + suffix,
             data=json.dumps(sensor_dict),
-            headers=headers)
+            headers=headers
+        )
 
         print(response.text)
         assert response.status_code == 200
@@ -452,9 +481,11 @@ class TestSensorsApi(object):
             'max_value': self.sensor.max_value
         }
         headers = {'Content-type': 'application/json'}
-        response = requests.patch(api_root + suffix,
+        response = requests.patch(
+            api_root + suffix,
             data=json.dumps(sensor_dict),
-            headers=headers)
+            headers=headers
+        )
 
         assert response.status_code == 403
 
@@ -469,9 +500,11 @@ class TestSensorsApi(object):
             'key': str(self.zone.key)
         }
         headers = {'Content-type': 'application/json'}
-        response = requests.patch(api_root + suffix,
+        response = requests.patch(
+            api_root + suffix,
             data=json.dumps(sensor_dict),
-            headers=headers)
+            headers=headers
+        )
 
         print(response.text)
         assert response.status_code == 400
@@ -480,9 +513,11 @@ class TestSensorsApi(object):
         data = {'key': str(self.zone.key)}
         headers = {'Content-type': 'application/json'}
         suffix = 'sensors/{}/'.format(self.sensor.id)
-        response = requests.delete(api_root + suffix,
+        response = requests.delete(
+            api_root + suffix,
             data=json.dumps(data),
-            headers=headers)
+            headers=headers
+        )
         assert response.status_code == 204
 
     def test_sensors_detail_delete_without_zone_key(self, api_root):
@@ -508,23 +543,27 @@ class TestSensorsApi(object):
         assert 'results' in data
 
     def test_sensor_data_list_get_with_sensor_filter(self, api_root):
-        excluded_sensor = Sensor(guid=uuid4(),
+        excluded_sensor = Sensor(
+            guid=uuid4(),
             name='Test Sensor Excluded',
             notes='Sensor notes.',
-            zone = self.zone,
+            zone=self.zone,
             min_value=20,
             max_value=25,
             min_value_operator='>=',
             max_value_operator='<=',
             state=True,
-            state_last_change_date=datetime.utcnow())
+            state_last_change_date=datetime.utcnow()
+        )
         excluded_sensor.save()
 
-        excluded_data = SensorData(sensor=excluded_sensor,
+        excluded_data = SensorData(
+            sensor=excluded_sensor,
             datetime=datetime.utcnow(),
             value=22,
             state=True,
-            state_changed=False)
+            state_changed=False
+        )
         excluded_data.save()
 
         suffix = 'data/?sensor_ids={}&format=json'.format(self.sensor.id)
@@ -543,28 +582,34 @@ class TestSensorsApi(object):
             self._compare_sensor_data_json(self.data[i], data_json)
 
     def test_sensor_data_list_get_with_zone_filter(self, api_root):
-        excluded_zone = Zone(name='Test Zone Excluded',
+        excluded_zone = Zone(
+            name='Test Zone Excluded',
             notes='Zone notes.',
-            key=uuid4())
+            key=uuid4()
+        )
         excluded_zone.save()
 
-        excluded_sensor = Sensor(guid=uuid4(),
+        excluded_sensor = Sensor(
+            guid=uuid4(),
             name='Test Sensor Excluded',
             notes='Sensor notes.',
-            zone = excluded_zone,
+            zone=excluded_zone,
             min_value=20,
             max_value=25,
             min_value_operator='>=',
             max_value_operator='<=',
             state=True,
-            state_last_change_date=datetime.utcnow())
+            state_last_change_date=datetime.utcnow()
+        )
         excluded_sensor.save()
 
-        excluded_data = SensorData(sensor=excluded_sensor,
+        excluded_data = SensorData(
+            sensor=excluded_sensor,
             datetime=datetime.utcnow(),
             value=22,
             state=True,
-            state_changed=False)
+            state_changed=False
+        )
         excluded_data.save()
 
         suffix = 'data/?zone_ids={}&format=json'.format(self.zone.id)
@@ -635,9 +680,11 @@ class TestSensorsApi(object):
             'key': str(self.zone.key)
         }
         headers = {'Content-type': 'application/json'}
-        response = requests.post(api_root + 'data/',
+        response = requests.post(
+            api_root + 'data/',
             data=json.dumps(data_dict),
-            headers=headers)
+            headers=headers
+        )
 
         data = response.json()
 
@@ -657,9 +704,11 @@ class TestSensorsApi(object):
             'value': 22.5
         }
         headers = {'Content-type': 'application/json'}
-        response = requests.post(api_root + 'data/',
+        response = requests.post(
+            api_root + 'data/',
             data=json.dumps(data_dict),
-            headers=headers)
+            headers=headers
+        )
 
         assert response.status_code == 403
 
@@ -673,9 +722,11 @@ class TestSensorsApi(object):
             'key': str(self.zone.key)
         }
         headers = {'Content-type': 'application/json'}
-        response = requests.post(api_root + 'data/',
+        response = requests.post(
+            api_root + 'data/',
             data=json.dumps(data_dict),
-            headers=headers)
+            headers=headers
+        )
 
         data = response.json()
 
@@ -687,14 +738,13 @@ class TestSensorsApi(object):
         self._compare_sensor_data_json(sensor_data, data)
 
         sensor = Sensor.objects.get(pk=self.sensor.id)
-        assert sensor.state == True
+        assert sensor.state is True
         assert sensor.state_last_change_date.strftime('%Y-%m-%dT%H:%M:%S.%fZ') == \
             prev_state_last_change_date.strftime('%Y-%m-%dT%H:%M:%S.%fZ')
 
         sensor_data.delete()
 
     def test_sensor_data_list_post_outside_range_updates_state(self, api_root):
-        prev_state = self.sensor.state
         prev_state_last_change_date = self.sensor.state_last_change_date
 
         data_dict = {
@@ -704,9 +754,11 @@ class TestSensorsApi(object):
             'key': str(self.zone.key)
         }
         headers = {'Content-type': 'application/json'}
-        response = requests.post(api_root + 'data/',
+        response = requests.post(
+            api_root + 'data/',
             data=json.dumps(data_dict),
-            headers=headers)
+            headers=headers
+        )
 
         data = response.json()
 
@@ -765,9 +817,11 @@ class TestSensorsApi(object):
             'key': str(zone.key),
         }
         headers = {'Content-type': 'application/json'}
-        response = requests.post(api_root + 'data/',
+        response = requests.post(
+            api_root + 'data/',
             data=json.dumps(data_dict),
-            headers=headers)
+            headers=headers
+        )
         response_json_first = response.json()
 
         num_sensors_after_add = Sensor.objects.all().count()
@@ -784,9 +838,11 @@ class TestSensorsApi(object):
             'key': str(zone.key),
         }
         headers = {'Content-type': 'application/json'}
-        response = requests.post(api_root + 'data/',
+        response = requests.post(
+            api_root + 'data/',
             data=json.dumps(data_dict),
-            headers=headers)
+            headers=headers
+        )
         response_json_second = response.json()
 
         num_sensors_after_second_request = Sensor.objects.all().count()
@@ -800,7 +856,6 @@ class TestSensorsApi(object):
         sensor = Sensor.objects.get(pk=data.sensor.id)
         data.delete()
         sensor.delete()
-
 
     def test_sensor_data_detail_put(self, api_root):
         response = requests.put(api_root + 'data/{}/'.format(self.data[0].id))
@@ -830,21 +885,25 @@ class TestSensorsApi(object):
         assert 'results' in data
 
     def test_zone_list_get_with_sensor_filter(self, api_root):
-        excluded_zone = Zone(name='Test Zone Excluded',
+        excluded_zone = Zone(
+            name='Test Zone Excluded',
             notes='Zone notes.',
-            key=uuid4())
+            key=uuid4()
+        )
         excluded_zone.save()
 
-        excluded_sensor = Sensor(guid=uuid4(),
+        excluded_sensor = Sensor(
+            guid=uuid4(),
             name='Test Sensor Excluded',
             notes='Sensor notes.',
-            zone = excluded_zone,
+            zone=excluded_zone,
             min_value=20,
             max_value=25,
             min_value_operator='>=',
             max_value_operator='<=',
             state=True,
-            state_last_change_date=datetime.utcnow())
+            state_last_change_date=datetime.utcnow()
+        )
         excluded_sensor.save()
 
         suffix = 'zones/?sensor_ids={}&format=json'.format(self.sensor.id)
@@ -862,9 +921,11 @@ class TestSensorsApi(object):
         self._compare_zone_json(self.zone, zone_json)
 
     def test_zone_list_get_with_zone_filter(self, api_root):
-        excluded_zone = Zone(name='Test Zone Excluded',
+        excluded_zone = Zone(
+            name='Test Zone Excluded',
             notes='Zone notes.',
-            key=uuid4())
+            key=uuid4()
+        )
         excluded_zone.save()
 
         suffix = 'zones/?zone_ids={}&format=json'.format(self.zone.id)
@@ -912,9 +973,11 @@ class TestSensorsApi(object):
             'key': str(self.zone.key)
         }
         headers = {'Content-type': 'application/json'}
-        response = requests.put(api_root + 'zones/{}/'.format(self.zone.id),
+        response = requests.put(
+            api_root + 'zones/{}/'.format(self.zone.id),
             data=json.dumps(zone_dict),
-            headers=headers)
+            headers=headers
+        )
 
         assert response.status_code == 200
         data = response.json()
@@ -928,9 +991,11 @@ class TestSensorsApi(object):
             'notes': 'PUT notes.'
         }
         headers = {'Content-type': 'application/json'}
-        response = requests.put(api_root + 'zones/{}/'.format(self.zone.id),
+        response = requests.put(
+            api_root + 'zones/{}/'.format(self.zone.id),
             data=json.dumps(zone_dict),
-            headers=headers)
+            headers=headers
+        )
 
         assert response.status_code == 403
 
@@ -941,9 +1006,11 @@ class TestSensorsApi(object):
             'key': str(self.zone.key)
         }
         headers = {'Content-type': 'application/json'}
-        response = requests.put(api_root + 'zones/{}/'.format(self.zone.id),
+        response = requests.put(
+            api_root + 'zones/{}/'.format(self.zone.id),
             data=json.dumps(zone_dict),
-            headers=headers)
+            headers=headers
+        )
 
         assert response.status_code == 400
 
@@ -954,9 +1021,11 @@ class TestSensorsApi(object):
             'key': str(self.zone.key)
         }
         headers = {'Content-type': 'application/json'}
-        response = requests.patch(api_root + 'zones/{}/'.format(self.zone.id),
+        response = requests.patch(
+            api_root + 'zones/{}/'.format(self.zone.id),
             data=json.dumps(zone_dict),
-            headers=headers)
+            headers=headers
+        )
 
         assert response.status_code == 200
         data = response.json()
@@ -970,9 +1039,11 @@ class TestSensorsApi(object):
             'notes': 'PATCH notes.'
         }
         headers = {'Content-type': 'application/json'}
-        response = requests.patch(api_root + 'zones/{}/'.format(self.zone.id),
+        response = requests.patch(
+            api_root + 'zones/{}/'.format(self.zone.id),
             data=json.dumps(zone_dict),
-            headers=headers)
+            headers=headers
+        )
 
         assert response.status_code == 403
 
@@ -983,9 +1054,11 @@ class TestSensorsApi(object):
             'key': str(self.zone.key)
         }
         headers = {'Content-type': 'application/json'}
-        response = requests.patch(api_root + 'zones/{}/'.format(self.zone.id),
+        response = requests.patch(
+            api_root + 'zones/{}/'.format(self.zone.id),
             data=json.dumps(zone_dict),
-            headers=headers)
+            headers=headers
+        )
 
         assert response.status_code == 400
 

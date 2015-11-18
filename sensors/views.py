@@ -1,20 +1,19 @@
 from datetime import datetime
 from decimal import Decimal
-from django.core.urlresolvers import resolve
-from django.shortcuts import render
 from django.utils.translation import ugettext
 from rest_framework import exceptions, mixins, viewsets
-from rest_framework.decorators import detail_route, list_route
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
 from sensors.models import Sensor, SensorData, Zone
 from sensors.serializers import (
     SensorSerializer, SensorDataSerializer, SensorDataSerializerCSV, ZoneSerializer)
 
+
 def _raise_zone_key_auth_failed():
     """Raise a `AuthenticationFailed` exception for a zone key auth failure."""
     msg = ugettext('Invalid zone key.')
     raise exceptions.AuthenticationFailed(msg)
+
 
 def _get_zone(request):
     """Get the `Zone` for the key specified in `request`.
@@ -41,6 +40,7 @@ def _get_zone(request):
         _raise_zone_key_auth_failed()
 
     return zone
+
 
 class SensorViewSet(viewsets.ModelViewSet):
     """Endpoint for `Sensor` management."""
@@ -77,14 +77,18 @@ class SensorViewSet(viewsets.ModelViewSet):
 
         page = self.paginate_queryset(queryset)
         if page is not None:
-            serializer = SensorSerializer(page,
+            serializer = SensorSerializer(
+                page,
                 many=True,
-                context={'request': request})
+                context={'request': request}
+            )
             return self.get_paginated_response(serializer.data)
 
-        serializer = SensorSerializer(queryset,
+        serializer = SensorSerializer(
+            queryset,
             many=True,
-            context={'request': request})
+            context={'request': request}
+        )
         return Response(serializer.data)
 
     def create(self, request):
@@ -105,10 +109,12 @@ class SensorViewSet(viewsets.ModelViewSet):
         A new `Sensor` object containing the data from `request`.
         """
         zone = _get_zone(request)
-        request.data['zone'] = reverse('zone-detail',
+        request.data['zone'] = reverse(
+            'zone-detail',
             args=[zone.id],
-            request=request)
-        
+            request=request
+        )
+
         return super(SensorViewSet, self).create(request)
 
     def update(self, request, pk=None, partial=False):
@@ -175,6 +181,7 @@ class SensorViewSet(viewsets.ModelViewSet):
             _raise_zone_key_auth_failed()
         return super(SensorViewSet, self).destroy(request, pk=pk)
 
+
 class SensorDataViewSet(mixins.CreateModelMixin,
                         mixins.ListModelMixin,
                         mixins.RetrieveModelMixin,
@@ -203,13 +210,17 @@ class SensorDataViewSet(mixins.CreateModelMixin,
             queryset = queryset.filter(sensor__zone_id__in=ids)
 
         if 'start_date' in request.GET:
-            start_date = datetime.strptime(request.GET['start_date'],
-                '%Y-%m-%dT%H:%M:%S.%fZ')
+            start_date = datetime.strptime(
+                request.GET['start_date'],
+                '%Y-%m-%dT%H:%M:%S.%fZ'
+            )
             queryset = queryset.filter(datetime__gte=start_date)
 
         if 'end_date' in request.GET:
-            end_date = datetime.strptime(request.GET['end_date'],
-                '%Y-%m-%dT%H:%M:%S.%fZ')
+            end_date = datetime.strptime(
+                request.GET['end_date'],
+                '%Y-%m-%dT%H:%M:%S.%fZ'
+            )
             queryset = queryset.filter(datetime__lte=end_date)
 
         if 'min_value' in request.GET:
@@ -235,21 +246,27 @@ class SensorDataViewSet(mixins.CreateModelMixin,
         # Use the special Sensor Serializer for CSV's here to remove a few
         # extra fields.
         if 'format' in request.GET and request.GET['format'] == "csv":
-            serializer = SensorDataSerializerCSV(queryset,
+            serializer = SensorDataSerializerCSV(
+                queryset,
                 many=True,
-                context={'request': request})
+                context={'request': request}
+            )
             return Response(serializer.data)
 
         page = self.paginate_queryset(queryset)
         if page is not None:
-            serializer = SensorDataSerializer(page,
+            serializer = SensorDataSerializer(
+                page,
                 many=True,
-                context={'request': request})
+                context={'request': request}
+            )
             return self.get_paginated_response(serializer.data)
 
-        serializer = SensorDataSerializer(queryset,
+        serializer = SensorDataSerializer(
+            queryset,
             many=True,
-            context={'request': request})
+            context={'request': request}
+        )
         return Response(serializer.data)
 
     def create(self, request):
@@ -290,10 +307,11 @@ class SensorDataViewSet(mixins.CreateModelMixin,
                 sensor.guid = request.data['guid']
                 sensor.zone = zone
                 sensor.save()
-            
+
             request.data['sensor'] = reverse('sensor-detail', args=[sensor.id], request=request)
 
         return super(SensorDataViewSet, self).create(request)
+
 
 class ZoneViewSet(mixins.UpdateModelMixin,
                   mixins.ListModelMixin,
@@ -332,14 +350,18 @@ class ZoneViewSet(mixins.UpdateModelMixin,
 
         page = self.paginate_queryset(queryset)
         if page is not None:
-            serializer = ZoneSerializer(page,
+            serializer = ZoneSerializer(
+                page,
                 many=True,
-                context={'request': request})
+                context={'request': request}
+            )
             return self.get_paginated_response(serializer.data)
 
-        serializer = ZoneSerializer(queryset,
+        serializer = ZoneSerializer(
+            queryset,
             many=True,
-            context={'request': request})
+            context={'request': request}
+        )
         return Response(serializer.data)
 
     def update(self, request, pk=None, partial=False):
