@@ -2,6 +2,7 @@
 
 from notifications import views
 
+
 def register_api_routes(router):
     """Register this application's API routes with the given `router`.
 

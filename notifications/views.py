@@ -1,8 +1,8 @@
-from django.shortcuts import render
-from rest_framework import exceptions, mixins, viewsets
+from rest_framework import mixins, viewsets
 from rest_framework.response import Response
-from notifications.models import SensorAlert, SensorAlertGroup
+from notifications.models import SensorAlert
 from notifications.serializers import SensorAlertSerializer
+
 
 class SensorAlertViewSet(mixins.ListModelMixin,
                          mixins.RetrieveModelMixin,
@@ -41,12 +41,16 @@ class SensorAlertViewSet(mixins.ListModelMixin,
 
         page = self.paginate_queryset(queryset)
         if page is not None:
-            serializer = SensorAlertSerializer(page,
+            serializer = SensorAlertSerializer(
+                page,
                 many=True,
-                context={'request': request})
+                context={'request': request}
+            )
             return self.get_paginated_response(serializer.data)
 
-        serializer = SensorAlertSerializer(queryset,
+        serializer = SensorAlertSerializer(
+            queryset,
             many=True,
-            context={'request': request})
+            context={'request': request}
+        )
         return Response(serializer.data)

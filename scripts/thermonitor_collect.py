@@ -8,7 +8,7 @@ Testing:
 
 To test the digitemp_DS9097 command without any actual real hardware,
 you can set CMD_EXECUTABLE below to "python ./digitemp_ds9097_fake_tester.py"
-to emulate some fake data. There's an example line below. See that script in 
+to emulate some fake data. There's an example line below. See that script in
 the "scripts" directory for more details.
 
 
@@ -28,9 +28,9 @@ wget https://github.com/kennethreitz/requests/tarball/master
 tar zxvf requests.tar.gz
 python setup.py install
 
-You may also need to create a .digitemp.rc file in /root. The "digitemp -i" command sets
-this up, see hh-controller-just.py for his implementation. I just copied the file
-from his directory.
+You may also need to create a .digitemp.rc file in /root. The "digitemp -i"
+command sets this up, see hh-controller-just.py for his implementation.
+I just copied the file from his directory.
 
 Then "crontab -e" and add:
 */15 * * * * cd /root; ./thermonitor_client.py  >/dev/null 2>&1
@@ -61,9 +61,10 @@ ROM 10 0x28 0x6F 0xCB 0x82 0x05 0x00 0x00 0x40
 
 
 0. Copy this script to the device you will be running it on.
-1. Change the API_ZONE_KEY and API_URL below. Zone key will be set in the django admin
-    after you create the zone.
-2. Setup cron to run the script as often as you'd like to report the temperatures. Something like:
+1. Change the API_ZONE_KEY and API_URL below. Zone key will be
+   set in the django admin after you create the zone.
+2. Setup cron to run the script as often as you'd like
+   to report the temperatures. Something like:
 
 */15 * * * * /usr/bin/python /path/to/termonitor_collect.py >/dev/null 2>&1
 
@@ -72,13 +73,14 @@ ROM 10 0x28 0x6F 0xCB 0x82 0x05 0x00 0x00 0x40
 API_ZONE_KEY = "FDEA9C52EBCA4F6D9B873FFF059F0392"
 API_URL = "http://localhost:9000/api/v1/"
 API_HEADERS = {'Content-type': 'application/json'}
-API_TIMEOUT = 4.0 # Time out API requests after this many seconds
+API_TIMEOUT = 4.0  # Time out API requests after this many seconds
 
 CMD_EXECUTABLE = "digitemp_DS9097"
 CMD_ARGUMENTS = "-a"
 
-# Uncomment this line for digitemp fake data generator.
-#CMD_EXECUTABLE = "python digitemp_ds9097_fake_tester.py"
+# Uncomment this line for digitemp fake data generator instead of
+# using local data.
+# CMD_EXECUTABLE = "python digitemp_ds9097_fake_tester.py"
 
 """
 
@@ -134,11 +136,11 @@ import requests
 
 # Check that the digitemp executable actually exists, quit if it is not installed.
 # Also ignore the python test script emulator... it doesn't work with this check.
-if not "python" in CMD_EXECUTABLE and not distutils.spawn.find_executable(CMD_EXECUTABLE):
+if "python" not in CMD_EXECUTABLE and not distutils.spawn.find_executable(CMD_EXECUTABLE):
     sys.exit("Unable to locate the '%s' executable. Is it installed or in the path?" % (CMD_EXECUTABLE))
 
 
-""" 
+"""
 Regular expression should be resilient enough to match lines with odd data.
 ALl of these are... mostly valid:
     28F17D8205000031 -48.762501
@@ -169,9 +171,9 @@ for line in os.popen("%s %s" % (CMD_EXECUTABLE, CMD_ARGUMENTS)).readlines():
 
     try:
         response = requests.post(
-            API_URL + "data/", 
-            data=json.dumps(data), 
-            headers=API_HEADERS, 
+            API_URL + "data/",
+            data=json.dumps(data),
+            headers=API_HEADERS,
             timeout=API_TIMEOUT,
         )
         print response.json()
@@ -181,8 +183,3 @@ for line in os.popen("%s %s" % (CMD_EXECUTABLE, CMD_ARGUMENTS)).readlines():
         # the documentation for it. I don't think it's really necessary at this point.
         # http://docs.python-requests.org/en/latest/user/quickstart/#timeouts
         pass
-
-
-
-
-

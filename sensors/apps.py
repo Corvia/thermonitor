@@ -5,8 +5,9 @@ http://stackoverflow.com/questions/31973707/django-signals-how-to-initialize-bin
 
 from django.apps import AppConfig
 
+
 class SensorAppConfig(AppConfig):
-    name="sensors"
+    name = "sensors"
 
     def ready(self):
-        from . import signals
+        from . import signals  # noqa

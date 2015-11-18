@@ -68,7 +68,12 @@ WSGI_APPLICATION = 'djthermonitor.wsgi.application'
 
 REST_FRAMEWORK = {
     'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.NamespaceVersioning',
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination'
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework.renderers.JSONRenderer',
+        'rest_framework.renderers.BrowsableAPIRenderer',
+        'rest_framework_csv.renderers.CSVRenderer',
+    ),
 }
 
 
@@ -119,7 +124,7 @@ DEFAULT_INDEX_TABLESPACE = ''
 
 # Load local configuration settings
 try:
-    from settings_local import *
+    from settings_local import *  # noqa
 except ImportError:
     pass
 
@@ -132,5 +137,5 @@ if not DEBUG:
     SESSION_COOKIE_SECURE = True
     SECURE_BROWSER_XSS_FILTER = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
-    #SECURE_SSL_REDIRECT = True # Enabling this one causes a redirect loop.
+    # SECURE_SSL_REDIRECT = True # Enabling this one causes a redirect loop.
 X_FRAME_OPTIONS = "DENY"
