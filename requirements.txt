@@ -12,6 +12,7 @@ djangorestframework
 djangorestframework-csv
 docutils
 Fabric
+flake8
 gunicorn
 psycopg2
 pytest

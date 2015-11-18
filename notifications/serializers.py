@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from notifications.models import SensorAlert, SensorAlertGroup
+from notifications.models import SensorAlert
+
 
 class SensorAlertSerializer(serializers.HyperlinkedModelSerializer):
     """A DRF serializer for `SensorAlert` objects."""
@@ -7,6 +8,6 @@ class SensorAlertSerializer(serializers.HyperlinkedModelSerializer):
         """Contains metadata for the DRF `SensorAlert`."""
         model = SensorAlert
         fields = ('id', 'sensor', 'data_point', 'alert_type', 'alert_class',
-            'recipients', 'message', 'date')
+                  'recipients', 'message', 'date')
         read_only_fields = ('id', 'sensor', 'data_point', 'alert_type',
-            'alert_class', 'recipients', 'message', 'date')
+                            'alert_class', 'recipients', 'message', 'date')

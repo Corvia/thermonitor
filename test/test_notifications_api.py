@@ -1,16 +1,15 @@
 """Contains functions for testing the functionality of the Notifications API."""
 
-import json
 import pytest
 import re
 import requests
 from datetime import datetime
-from decimal import Decimal
-from django.contrib.auth.models import Group, User
+from django.contrib.auth.models import User
 from notifications.models import SensorAlert, SensorAlertGroup
 from sensors.models import Sensor, SensorData, Zone
 from django.core import mail
 from uuid import uuid4
+
 
 class TestSensorsApi(object):
     user = None
@@ -56,29 +55,35 @@ class TestSensorsApi(object):
                 self.user.delete()
 
         username = str(uuid4())[:30]
-        self.user = User(username=username,
-            email='{}@example.net'.format(username))
+        self.user = User(
+            username=username,
+            email='{}@example.net'.format(username)
+        )
         self.user.save()
 
         self.alert_group = SensorAlertGroup(name='Test Group')
         self.alert_group.save()
         self.alert_group.users.add(self.user)
 
-        self.zone = Zone(name='Test Zone',
+        self.zone = Zone(
+            name='Test Zone',
             notes='Zone notes.',
-            key=uuid4())
+            key=uuid4()
+        )
         self.zone.save()
 
-        self.sensor = Sensor(guid=uuid4(),
+        self.sensor = Sensor(
+            guid=uuid4(),
             name='Test Sensor',
             notes='Sensor notes.',
-            zone = self.zone,
+            zone=self.zone,
             min_value=60,
             max_value=85,
             min_value_operator='>=',
             max_value_operator='<=',
             state=True,
-            state_last_change_date=datetime.utcnow())
+            state_last_change_date=datetime.utcnow()
+        )
         self.sensor.save()
         self.sensor.alert_groups.add(self.alert_group)
 
@@ -88,11 +93,13 @@ class TestSensorsApi(object):
         assert 0 == len(mail.outbox)
 
         # Create in-range data point; no notification.
-        datum = SensorData(sensor=self.sensor,
+        datum = SensorData(
+            sensor=self.sensor,
             datetime=datetime.utcnow(),
             value=self.sensor.min_value + 1,
             state=True,
-            state_changed=False)
+            state_changed=False
+        )
         datum.save()
         self.data.append(datum)
 
@@ -100,11 +107,13 @@ class TestSensorsApi(object):
         assert 0 == len(mail.outbox)
 
         # Create out-of-range notification; sends "alert."
-        datum = SensorData(sensor=self.sensor,
+        datum = SensorData(
+            sensor=self.sensor,
             datetime=datetime.utcnow(),
             value=self.sensor.min_value - 1,
             state=True,
-            state_changed=False)
+            state_changed=False
+        )
         datum.save()
         self.data.append(datum)
 
@@ -112,11 +121,13 @@ class TestSensorsApi(object):
         assert 1 == len(mail.outbox)
 
         # Create another in-range data point; sends "recovered."
-        datum = SensorData(sensor=self.sensor,
+        datum = SensorData(
+            sensor=self.sensor,
             datetime=datetime.utcnow(),
             value=self.sensor.min_value + 1,
             state=True,
-            state_changed=False)
+            state_changed=False
+        )
         datum.save()
         self.data.append(datum)
 
@@ -246,7 +257,7 @@ class TestSensorsApi(object):
     def test_alerts_detail_patch(self, api_root):
         alert = self.alerts[0]
         suffix = 'alerts/{0}/?format=json'.format(alert.id)
-        response = requests.patch(api_root +suffix)
+        response = requests.patch(api_root + suffix)
         assert response.status_code == 405
 
     def test_alerts_detail_delete(self, api_root):

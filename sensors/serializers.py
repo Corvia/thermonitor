@@ -2,10 +2,11 @@ from datetime import datetime
 from rest_framework import serializers
 from sensors.models import Sensor, SensorData, Zone
 
+
 class SensorSerializer(serializers.HyperlinkedModelSerializer):
     """A DRF serializer for `Sensor` objects."""
     def create(self, validated_data):
-        """Createa `Sensor` instance using `validated_data`.
+        """Create a `Sensor` instance using `validated_data`.
 
         The `state` and `state_last_change_date` are read-only because they
         can't be changed by users (they're effectively computed values).
@@ -20,9 +21,10 @@ class SensorSerializer(serializers.HyperlinkedModelSerializer):
         """Contains metadata for the DRF `Sensor` serializer class."""
         model = Sensor
         fields = ('id', 'guid', 'name', 'notes', 'state',
-            'state_last_change_date', 'zone', 'latest_value', 'min_value',
-            'max_value', 'min_value_operator', 'max_value_operator')
+                  'state_last_change_date', 'zone', 'latest_value', 'min_value',
+                  'max_value', 'min_value_operator', 'max_value_operator')
         read_only_fields = ('state', 'state_last_change_date', 'latest_value')
+
 
 class SensorDataSerializer(serializers.HyperlinkedModelSerializer):
     """A DRF serializer for `SensorData` objects."""
@@ -50,6 +52,7 @@ class SensorDataSerializer(serializers.HyperlinkedModelSerializer):
         model = SensorData
         fields = ('id', 'datetime', 'sensor_name', 'value', 'sensor', 'state', 'state_changed')
         read_only_fields = ('state', 'state_changed')
+
 
 class SensorDataSerializerCSV(SensorDataSerializer):
     """ A DEF serializer for `SensorData` objects. Used to be a bit more specific with the CSV response. """

@@ -1,8 +1,7 @@
 #!/usr/bin/python
 
-"""
-Emulate the output of the digitemp_DS9097 for testing purposes.
-"""
+# Emulate the output of the digitemp_DS9097 for testing purposes.
+
 
 import random
 import decimal
