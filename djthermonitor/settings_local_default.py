@@ -41,7 +41,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'djthermonitor',
         'USER': 'djthermonitor',
-        'PASSWORD': 'Stc7Cb5YhcWLmT1jon2bedTYUUEq4PBw',
+        'PASSWORD': '@@@@POSTGRESQL_PASSWORD@@@@',
         'HOST': '127.0.0.1',
         'PORT': '5432',
     }
