@@ -1,5 +1,6 @@
-var ThermonitorDispatcher = require('../dispatcher/ThermonitorDispatcher');
+var assign = require('object-assign');
 var SensorConstants = require('../constants/SensorConstants');
+var ThermonitorDispatcher = require('../dispatcher/ThermonitorDispatcher');
 
 var SensorActions = {
     createSensor: function(sensor) {
@@ -81,7 +82,7 @@ var SensorActions = {
         });
         
         var self = this;
-        var data = $.extend(filters || {}, {
+        var data = assign(filters || {}, {
             limit: limit,
             offset: offset
         });

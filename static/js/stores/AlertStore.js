@@ -1,18 +1,29 @@
-var ThermonitorDispatcher = require('../dispatcher/ThermonitorDispatcher');
-var EventEmitter = require('events').EventEmitter;
+var _ = require('lodash');
 var AlertConstants = require('../constants/AlertConstants');
 var assign = require('object-assign');
+var EventEmitter = require('events').EventEmitter;
+var ThermonitorDispatcher = require('../dispatcher/ThermonitorDispatcher');
 
 var CHANGE_EVENT = 'change';
 
-var _alerts = {};
+var _alerts = [];
 
 function createAlert(alert) {
-    _alerts[alert.id] = alert;
+    _alerts.push(alert);
+    AlertStore.emitChange();
 }
 
 function updateAlert(alert) {
-    _alerts[alert.id] = alert;
+    var index = _.findIndex(_alerts, 'id', alert.id);
+    
+    if (index < 0) {
+        _alerts.push(alert);
+    }
+    else {
+        _alerts[index] = assign(_alerts[index], alert);
+    }
+
+    AlertStore.emitChange();
 }
 
 var AlertStore = assign({}, EventEmitter.prototype, {
@@ -33,99 +44,54 @@ var AlertStore = assign({}, EventEmitter.prototype, {
      *      representations.
      */
     getFilteredAlerts: function(filters) {
-        if (!filters || (
-            !filters.hasOwnProperty('alertIds') &&
-            !filters.hasOwnProperty('alertIds') &&
-            !filters.hasOwnProperty('zoneIds'))) {
-                return _alerts;
+        if (!filters || (!filters.alertIds && !filters.sensorIds)) {
+            return _alerts;
         }
 
         var getSensorId = function(alert) {
-            if (!alert ||
-                !alert.hasOwnProperty('alert') ||
-                typeof alert.alert !== 'string') {
-                    return null;
+            if (!alert || typeof alert.sensor !== 'string') {
+                return null;
             }
-            return parseInt(alert.alert.split('/')
+            return parseInt(alert.sensor.split('/')
                 .filter(function(e) { return !!e; })
                 .pop());
         }
 
-        var isExcludedByAlertIdsFilter;
-        if (!filters.hasOwnProperty('alertIds') ||
-            !Array.isArray(filters.alertIds) ||
-            filters.alertIds.length === 0) {
-                isExcludedByAlertIdsFilter = function(alert) {
-                    return false;
-                };
-        }
-        else {
-            isExcludedByAlertIdsFilter = function(alert) {
-                return filters.alertIds.indexOf(alert.id) < 0;
-            }
+        var filteredAlerts = _alerts;
+        if (Array.isArray(filters.alertIds) && filters.alertIds.length > 0) {
+            filteredAlerts = filteredAlerts.filter(function(alert) {
+                return filters.alertIds.indexOf(alert.id) >= 0;
+            });
         }
 
-        var isExcludedBySensorIdsFilter;
-        if (!filters.hasOwnProperty('sensorIds') ||
-            !Array.isArray(filters.sensorIds) ||
-            filters.sensorIds.length === 0) {
-                isExcludedBySensorIdsFilter = function(alert) {
-                    return false;
-                };
-        }
-        else {
-            isExcludedBySensorIdsFilter = function(alert) {
-                var sensorId = getSensorId(alert);
-                return filters.sensorIds.indexOf(sensorId) < 0;
-            }
+        if (Array.isArray(filters.sensorIds) && filters.sensorIds.length > 0) {
+            filteredAlerts = filteredAlerts.filter(function(alert) {
+                var alertId = getSensorId(alert);
+                return filters.sensorIds.indexOf(sensorId) >= 0;
+            });
         }
 
-        var result = {};
-        for (var alertId in _alerts) {
-            var alert = _alerts[alertId];
-            if (isExcludedByAlertIdsFilter(alert) ||
-                isExcludedBySensorIdsFilter(alert)) {
-                    continue;
-            }
-
-            result[alert.id] = alert;
-        }
-
-        return result;
+        return filteredAlerts;
     },
 
     /**
-     * Gets a paged and optionally filtered collection of the store's Sensor
+     * Gets a paged and optionally filtered collection of the store's Alert
      * object representations.
-     * @param limit {Number} The maximum number of Sensors to include in the
+     * @param limit {Number} The maximum number of Alerts to include in the
      *      result set.
      * @param offset {Number} The number of elements to skip before returning
      *      the result set.
      * @param filters {Object} An object containing the filters. See
-     *      `getFilteredSensors` for a description of the available filters.
+     *      `getFilteredAlerts` for a description of the available filters.
      * @returns {Array} A paged and optionally filtered collection of the
-     *      store's Sensor object representations.
+     *      store's Alert object representations.
      */
     getPagedAlerts: function(limit, offset, filters) {
         var filteredAlerts = filters ?
             this.getFilteredAlerts(filters) :
             _alerts;
 
-        var result = {};
-        var counter = 0;
-        for (var alertId in filteredAlerts) {
-            if (counter >= offset + limit) {
-                break;
-            }
-
-            if (counter >= offset) {
-                result[alertId] = filteredAlerts[alertId];
-            }
-            
-            counter++;
-        }
-
-        return result;
+        return filteredAlerts.slice(offset, offset + limit);
     },
 
     /**
@@ -135,11 +101,11 @@ var AlertStore = assign({}, EventEmitter.prototype, {
      *      `null` if the object does not exist.
      */
     getAlert: function(id) {
-        if (!_alerts.hasOwnProperty(id)) {
-            return null;
-        }
+        var result = _alerts.filter(function(alert) {
+            return alert.id === id;
+        });
 
-        return _alerts[id];
+        return result.length > 0 ? result[0] : null;
     },
 
     emitChange: function() {
@@ -169,7 +135,7 @@ var AlertStore = assign({}, EventEmitter.prototype, {
                 break;
 
             case AlertConstants.ALERT_RECEIVE_SINGLE:
-                updateSensor(payload.alert);
+                updateAlert(payload.alert);
                 break;
         }
 

@@ -1,14 +1,32 @@
-var ThermonitorDispatcher = require('../dispatcher/ThermonitorDispatcher');
-var EventEmitter = require('events').EventEmitter;
-var ZoneConstants = require('../constants/ZoneConstants');
+var _ = require('lodash');
 var assign = require('object-assign');
+var EventEmitter = require('events').EventEmitter;
+var ThermonitorDispatcher = require('../dispatcher/ThermonitorDispatcher');
+var ZoneConstants = require('../constants/ZoneConstants');
 
 var CHANGE_EVENT = 'change';
 
-var _zones = {};
+var _zones = [];
+
+function createZone(zone) {
+    _zones.push(zone);
+    ZoneStore.emitChange();
+}
 
 function updateZone(zone) {
-    _zones[zone.id] = zone;
+    var index = _.findIndex(_zones, 'id', zone.id);
+    var target = _zones.filter(function(e) {
+        return zone.id === e.id;
+    });
+
+    if (index < 0) {
+        _zones.push(zone);
+    }
+    else {
+        _zones[index] = assign(_zones[index], zone);
+    }
+
+    ZoneStore.emitChange();
 }
 
 var ZoneStore = assign({}, EventEmitter.prototype, {
@@ -26,67 +44,38 @@ var ZoneStore = assign({}, EventEmitter.prototype, {
      *      representations.
      */
     getFilteredZones: function(filters) {
-        if (!filters || !filters.hasOwnProperty('zoneIds')) {
-            return _sensors;
+        if (!filters || !filters.zoneIds) {
+            return _zones;
         }
 
-        var isExcludedByZoneIdsFilter;
-        if (!filters.hasOwnProperty('zoneIds') ||
-            !Array.isArray(filters.zoneIds) ||
-            filters.zoneIds.length === 0) {
-                isExcludedByZoneIdsFilter = function(zone) {
-                    return false;
-                };
-        }
-        else {
-            isExcludedByZoneIdsFilter = function(zone) {
-                return filters.zoneIds.indexOf(zone.id) < 0;
-            }
+        var filteredZones = _zones;
+        if (Array.isArray(filters.zoneIds) && filters.zoneIds.length > 0) {
+            filteredZones = filteredZones.filter(function(zone) {
+                return filters.zoneIds.indexOf(zone.id) >= 0;
+            });
         }
 
-        var result = {};
-        for (var zoneId in _zones) {
-            var zone = _zones[zoneId];
-            if (isExcludedByZoneIdsFilter(zone)) {
-                continue;
-            }
-
-            result[zone.id] = zone;
-        }
-
-        return result;
+        return filteredZones;
     },
 
     /**
-     * Gets a paged and optionally filtered collection of the store's Sensor
+     * Gets a paged and optionally filtered collection of the store's Zone
      * object representations.
-     * @param limit {Number} The maximum number of Sensors to include in the
+     * @param limit {Number} The maximum number of Zones to include in the
      *      result set.
      * @param offset {Number} The number of elements to skip before returning
      *      the result set.
      * @param filters {Object} An object containing the filters. See
      *      `getFilteredSensors` for a description of the available filters.
      * @returns {Array} A paged and optionally filtered collection of the
-     *      store's Sensor object representations.
+     *      store's Zone object representations.
      */
     getPagedZones: function(limit, offset, filters) {
-        var filteredZones = filters ? this.getFilteredZones(filters) : _zones;
+        var filteredZones = filters ?
+            this.getFilteredZones(filters) :
+            _zones;
 
-        var result = {};
-        var counter = 0;
-        for (var zoneId in filteredZones) {
-            if (counter >= offset + limit) {
-                break;
-            }
-
-            if (counter >= offset) {
-                result[zoneId] = filteredZones[zoneId];
-            }
-            
-            counter++;
-        }
-
-        return result;
+        return filteredZones.slice(offset, offset + limit);
     },
 
     /**
@@ -96,11 +85,11 @@ var ZoneStore = assign({}, EventEmitter.prototype, {
      *      `null` if the object does not exist.
      */
     getZone: function(id) {
-        if (!_zones.hasOwnProperty(id)) {
-            return null;
-        }
+        var result = _zones.filter(function(zone) {
+            return zone.id === id;
+        });
 
-        return _zones[id];
+        return result.length > 0 ? result[0] : null;
     },
 
     emitChange: function() {
@@ -137,8 +126,6 @@ var ZoneStore = assign({}, EventEmitter.prototype, {
                 updateZone(zone);
                 break;
         }
-
-        ZoneStore.emitChange();
 
         return true;
     })
