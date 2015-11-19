@@ -1,5 +1,6 @@
 var AlertActions = require('../actions/AlertActions');
 var AlertStore = require('../stores/AlertStore');
+var assign = require('object-assign');
 var Footer = require('./Footer.react');
 var GraphSection = require('./GraphSection.react');
 var Header = require('./Header.react');
@@ -13,21 +14,16 @@ var ZoneStore = require('../stores/ZoneStore');
 
 var ThermonitorApp = React.createClass({
     componentDidMount: function() {
-        AlertStore.addChangeListener(this._onChange);
-        SensorStore.addChangeListener(this._onChange);
-        ZoneStore.addChangeListener(this._onChange);
-
-        this.requestData();
-        var intervalId = setInterval(this.requestData, 10000);
-        this.setState($.extend(this.state, {
-            intervalId: intervalId
-        }));
+        this.update();
+        var intervalId = setInterval(this.update, 1000);
+        var state = assign(this.state, {intervalId: intervalId});
+        this.setState(state);
     },
 
     componentWillUnmount: function() {
-        AlertStore.removeChangeListener(this._onChange);
-        SensorStore.removeChangeListener(this._onChange);
-        ZoneStore.removeChangeListener(this._onChange);
+        if (this.state.intervalId) {
+            clearInterval(this.state.intervalId);
+        }
     },
 
     getInitialState: function() {
@@ -35,41 +31,21 @@ var ThermonitorApp = React.createClass({
     },
 
     render: function() {
-        if (!this.state.hasOwnProperty('zones')) {
-            return (
-                <div>
-                    <Header />
-                    <div className="container loading"><h3>Loading…</h3></div>
-                    <Footer />
-                </div>
-            );
-        }
-
         return (
             <div>
                 <Header />
-                <GraphSection sensors={this.state.sensors} />
-                <ZoneSection zones={this.state.zones} />
-                <NotificationSection alerts={this.state.alerts} />
+                <GraphSection />
+                <ZoneSection />
+                <NotificationSection />
                 <Footer />
             </div>
         );
     },
 
-    requestData: function() {
+    update: function() {
         AlertActions.requestAlerts();
+        SensorActions.requestSensors();
         ZoneActions.requestZones();
-        SensorActions.requestSensors({
-            zoneIds: Object.keys(this.state.zones)
-        });
-    },
-
-    _onChange: function() {
-        this.setState($.extend(this.state, {
-            alerts: AlertStore.getAllAlerts(),
-            sensors: SensorStore.getAllSensors(),
-            zones: ZoneStore.getAllZones()
-        }));
     }
 });
 

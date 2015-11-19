@@ -3,14 +3,14 @@ var React = require('react');
 var Sensor = React.createClass({
     render: function() {
         var progressBarStyle = {
-            width: '40%'
+            width: this.props.sensor.latest_value + '%'
         };
         return (
             <div className="sensor col-md-2">
                 <div className="progress vertical">
                     <div className="progress-bar progress-bar-info progress-bar-striped active"
                         role="progressbar"
-                        aria-valuenow="{this.props.sensor.latest_value}"
+                        aria-valuenow={String(this.props.sensor.latest_value)}
                         aria-valuemin="0"
                         aria-valuemax="100"
                         style={progressBarStyle} />

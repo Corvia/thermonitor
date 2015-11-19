@@ -1,3 +1,4 @@
+var assign = require('object-assign');
 var moment = require('moment');
 var React = require('react');
 
@@ -12,18 +13,22 @@ function getCurrentDateTime() {
 }
 
 var Header = React.createClass({
-    update: function() {
-        this.setState($.extend(this.state, getCurrentDateTime()));
+    componentDidMount: function() {
+        var intervalId = setInterval(this.update, 1000);
+        var state = assign(this.state, {intervalId: intervalId});
+        this.setState(state);
+    },
+
+    componentWillUnmount: function() {
+        SensorStore.removeChangeListener(this._onSensorStoreChange);
+
+        if (this.state.intervalId) {
+            clearInterval(this.state.intervalId);
+        }
     },
 
     getInitialState: function() {
         return getCurrentDateTime();
-    },
-
-    componentDidMount: function() {
-        var intervalId = setInterval(this.update, 1000);
-        var state = $.extend(this.state, {intervalId: intervalId});
-        this.setState(state);
     },
 
     render: function() {
@@ -41,6 +46,11 @@ var Header = React.createClass({
                 </div>
             </div>
         );
+    },
+
+    update: function() {
+        var state = assign(this.state, getCurrentDateTime());
+        this.setState(state);
     }
 });
 

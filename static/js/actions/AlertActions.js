@@ -1,5 +1,6 @@
-var ThermonitorDispatcher = require('../dispatcher/ThermonitorDispatcher');
 var AlertConstants = require('../constants/AlertConstants');
+var assign = require('object-assign');
+var ThermonitorDispatcher = require('../dispatcher/ThermonitorDispatcher');
 
 var AlertActions = {
     receiveAlert: function(alert) {
@@ -67,7 +68,7 @@ var AlertActions = {
         });
         
         var self = this;
-        var data = $.extend(filters || {}, {
+        var data = assign(filters || {}, {
             limit: limit,
             offset: offset
         });
