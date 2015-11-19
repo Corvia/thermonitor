@@ -1,3 +1,4 @@
+var assign = require('object-assign');
 var ThermonitorDispatcher = require('../dispatcher/ThermonitorDispatcher');
 var ZoneConstants = require('../constants/ZoneConstants');
 
@@ -67,7 +68,7 @@ var ZoneActions = {
         });
         
         var self = this;
-        var data = $.extend(filters || {}, {
+        var data = assign(filters || {}, {
             limit: limit,
             offset: offset
         });

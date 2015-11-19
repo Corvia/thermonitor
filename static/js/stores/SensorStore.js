@@ -1,22 +1,36 @@
-var ThermonitorDispatcher = require('../dispatcher/ThermonitorDispatcher');
-var EventEmitter = require('events').EventEmitter;
-var SensorConstants = require('../constants/SensorConstants');
+var _ = require('lodash');
 var assign = require('object-assign');
+var EventEmitter = require('events').EventEmitter;
+var SensorActions = require('../actions/SensorActions');
+var SensorConstants = require('../constants/SensorConstants');
+var ThermonitorDispatcher = require('../dispatcher/ThermonitorDispatcher');
 
 var CHANGE_EVENT = 'change';
 
-var _sensors = {};
+var _sensors = [];
 
 function createSensor(sensor) {
-    _sensors[sensor.id] = sensor;
+    _sensors.push(sensor);
+    SensorStore.emitChange();
 }
 
-function destroySensor(id) {
-    delete _sensors[id];
+function destroySensor(sensor) {
+    var index = _.findIndex(_sensors, 'id', sensor.id);
+    _sensors.splice(index, 1);
+    SensorStore.emitChange();
 }
 
 function updateSensor(sensor) {
-    _sensors[sensor.id] = sensor;
+    var index = _.findIndex(_sensors, 'id', sensor.id);
+    
+    if (index < 0) {
+        _sensors.push(sensor);
+    }
+    else {
+        _sensors[index] = assign(_sensors[index], sensor);
+    }
+    
+    SensorStore.emitChange();
 }
 
 var SensorStore = assign({}, EventEmitter.prototype, {
@@ -36,64 +50,34 @@ var SensorStore = assign({}, EventEmitter.prototype, {
      *      representations.
      */
     getFilteredSensors: function(filters) {
-        if (!filters || (
-            !filters.hasOwnProperty('sensorIds') &&
-            !filters.hasOwnProperty('zoneIds'))) {
-                return _sensors;
+        if (!filters || (!filters.sensorIds && !filters.zoneIds)) {
+            return _sensors;
         }
 
         var getZoneId = function(sensor) {
-            if (!sensor ||
-                !sensor.hasOwnProperty('zone') ||
-                typeof sensor.zone !== 'string') {
-                    return null;
+            if (!sensor || typeof sensor.zone !== 'string') {
+                return null;
             }
             return parseInt(sensor.zone.split('/')
                 .filter(function(e) { return !!e; })
                 .pop());
         }
 
-        var isExcludedBySensorIdsFilter;
-        if (!filters.hasOwnProperty('sensorIds') ||
-            !Array.isArray(filters.sensorIds) ||
-            filters.sensorIds.length === 0) {
-                isExcludedBySensorIdsFilter = function(sensor) {
-                    return false;
-                };
-        }
-        else {
-            isExcludedBySensorIdsFilter = function(sensor) {
+        var filteredSensors = _sensors;
+        if (Array.isArray(filters.sensorIds) && filters.sensorIds.length > 0) {
+            filteredSensors = filteredSensors.filter(function(sensor) {
                 return filters.sensorIds.indexOf(sensor.id) >= 0;
-            }
+            });
         }
 
-        var isExcludedByZoneIdsFilter;
-        if (!filters.hasOwnProperty('zoneIds') ||
-            !Array.isArray(filters.zoneIds) ||
-            filters.zoneIds.length === 0) {
-                isExcludedByZoneIdsFilter = function(sensor) {
-                    return false;
-                };
-        }
-        else {
-            isExcludedByZoneIdsFilter = function(sensor) {
+        if (Array.isArray(filters.zoneIds) && filters.zoneIds.length > 0) {
+            filteredSensors = filteredSensors.filter(function(sensor) {
                 var zoneId = getZoneId(sensor);
-                return filters.zoneIds.indexOf(zoneId) < 0;
-            }
+                return filters.zoneIds.indexOf(zoneId) >= 0;
+            });
         }
 
-        var result = {};
-        for (var sensorId in _sensors) {
-            var sensor = _sensors[sensorId];
-            if (isExcludedBySensorIdsFilter(sensor) ||
-                isExcludedByZoneIdsFilter(sensor)) {
-                    continue;
-            }
-
-            result[sensor.id] = sensor;
-        }
-
-        return result;
+        return filteredSensors;
     },
 
     /**
@@ -113,21 +97,7 @@ var SensorStore = assign({}, EventEmitter.prototype, {
             this.getFilteredSensors(filters) :
             _sensors;
 
-        var result = {};
-        var counter = 0;
-        for (var sensorId in filteredSensors) {
-            if (counter >= offset + limit) {
-                break;
-            }
-
-            if (counter >= offset) {
-                result[sensorId] = filteredSensors[sensorId];
-            }
-            
-            counter++;
-        }
-
-        return result;
+        return filteredSensors.slice(offset, offset + limit);
     },
 
     /**
@@ -137,11 +107,11 @@ var SensorStore = assign({}, EventEmitter.prototype, {
      *      `null` if the object does not exist.
      */
     getSensor: function(id) {
-        if (!_sensors.hasOwnProperty(id)) {
-            return null;
-        }
+        var result = _sensors.filter(function(sensor) {
+            return sensor.id === id;
+        });
 
-        return _sensors[id];
+        return result.length > 0 ? result[0] : null;
     },
 
     emitChange: function() {
@@ -167,7 +137,7 @@ var SensorStore = assign({}, EventEmitter.prototype, {
                 break;
 
             case SensorConstants.SENSOR_DESTROY:
-                destroySensor(payload.sensor.id);
+                destroySensor(payload.sensor);
                 break;
 
             case SensorConstants.SENSOR_RECEIVE_MANY:
@@ -185,9 +155,10 @@ var SensorStore = assign({}, EventEmitter.prototype, {
             case SensorConstants.SENSOR_UPDATE:
                 updateSensor(payload.sensor);
                 break;
-        }
 
-        SensorStore.emitChange();
+            default:
+                break;
+        }
 
         return true;
     })

@@ -3,11 +3,15 @@ var Sensor = require('./Sensor.react')
 
 var SensorList = React.createClass({
     render: function() {
-        var sensorNodes = [];
-        for (var sensorId in this.props.sensors) {
-            var sensor = this.props.sensors[sensorId];
-            sensorNodes.push(<Sensor key={sensor.guid} sensor={sensor} />);
+        var sensorNodes = this.props.sensors.map(function(sensor) {
+            return <Sensor key={sensor.guid} sensor={sensor} />;
+        });
+
+        if (sensorNodes.length === 0) {
+            var style = {marginLeft: '15px'};
+            sensorNodes = <h4 style={style}>There are no sensors to display.</h4>
         }
+
         return (
             <div className="sensorList row gauges">
                 {sensorNodes}
