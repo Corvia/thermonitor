@@ -43,7 +43,7 @@ var ThermonitorApp = React.createClass({
     },
 
     update: function() {
-        AlertActions.requestAlerts();
+        AlertActions.requestPagedAlerts(5, 0);
         SensorActions.requestSensors();
         ZoneActions.requestZones();
     }
