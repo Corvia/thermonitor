@@ -45,6 +45,28 @@ class Zone(models.Model):
     class Meta:
         ordering = ["name"]
 
+class SensorUnit(models.Model):
+    """Sensor Unit
+      -The type of units that a data point on a sensor respresents (Degrees F, Degrees C, 
+       Humidity %, etc)
+    """
+    value = models.CharField(
+        "Abbreviated Unit Type",
+        max_length=5,
+        help_text="Unit Type Abbreviated",
+    )
+    name = models.CharField(
+        "Full Unit Name",
+        max_length=80,
+        help_text="Unabbreviated unit description (i.e. Fahrenheit).",
+    )
+
+    def __unicode__(self):
+        return self.name
+
+    class Meta:
+        ordering = ["name"]
+
 
 class Sensor(models.Model):
     """ Sensor Device
@@ -57,7 +79,7 @@ class Sensor(models.Model):
        will receive a notification.
      - state_last_change_date will help us track how long a device has been failed
        or working fine.
-     - Sensor device temperatures are saved in Fahrenheit.
+     - Sensor device values are saved as SensorUnit.
      - GUID's are unique per zone.
     """
     name = models.CharField(
@@ -77,11 +99,12 @@ class Sensor(models.Model):
         blank=True,
         help_text="Notes specific to this sensor, location, contact information.",
     )
+    units = models.ForeignKey(SensorUnit, default=1)
     min_value = models.DecimalField(
-        "Minimum Check Value ('F)",
+        "Minimum Unit Check Value)",
         max_digits=4,
         decimal_places=1,
-        help_text="Lower range threshold value, in degrees Fahrenheit.",
+        help_text="Lower range threshold value, in units.",
         default="35.0",
     )
     min_value_operator = models.CharField(
@@ -93,10 +116,10 @@ class Sensor(models.Model):
         default=">",
     )
     max_value = models.DecimalField(
-        "Maximum Check Value ('F)",
+        "Maximum Unit Check Value",
         max_digits=4,
         decimal_places=1,
-        help_text="Upper range threshold value, in degrees Fahrenheit.",
+        help_text="Upper range threshold value, in units.",
         default="75.0",
     )
     max_value_operator = models.CharField(
@@ -176,6 +199,7 @@ class Sensor(models.Model):
 
         return users
 
+    # FIXME change all Fahrenheit functions to generic units
     def min_value_f(self):
         """
         Get the Fahrenheit version of the `min_value` decimal fields.
@@ -183,6 +207,7 @@ class Sensor(models.Model):
         """
         return int(self.min_value)
 
+    # FIXME change all Fahrenheit functions to generic units
     def max_value_f(self):
         """
         Get the Fahrenheit version of the `max_value` decimal fields.
@@ -199,19 +224,18 @@ class Sensor(models.Model):
         except SensorData.DoesNotExist:
             return None
 
-
 class SensorData(models.Model):
     """Sensor Data
      - We expect all of our sensors in this app to store values in a Decimal format (XXX.X).
      - Record if this value is outside of the range checks for the sensor and if the state
        changed compared to the last check (OK -> failed, failed -> OK). This will allow us
        graph/query data points where the checks failed and how many times relatively easily.
-     - Sensor data is logged in Fahrenheit.
+     - Sensor data is logged in SensorUnits.
     """
     sensor = models.ForeignKey(Sensor)
     datetime = models.DateTimeField(auto_now_add=True)
     value = models.DecimalField(
-        "Sensor Data Value - Fahrenheit",
+        "Sensor Data Value",
         max_digits=4,
         decimal_places=1,
     )
@@ -228,6 +252,7 @@ class SensorData(models.Model):
     class Meta:
         ordering = ["-datetime"]
 
+    # FIXME change all Fahrenheit functions to generic units
     def value_f(self):
         """Returns the temperature value in degrees Fahrenheit
         Used to be the case we would store values in Celsius, but those days are over..."""
