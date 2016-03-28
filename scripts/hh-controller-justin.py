@@ -248,15 +248,15 @@ while True:
             if (table_avg_temp < (table_temp_target - table_temp_delta)):
                 toggle_relay(ser_pump,True)
 
-        if (not os.path.isfile("/media/firestation/connected")):
+        if (not os.path.isfile("/local/mountpoint/connected")):
             print "Attempting to connect to network drive for data logging"
             # try to remount drive (maybe something went down?)
-            cmd = "mount -t cifs //192.168.220.10/hhcontroller /media/firestation -o username=hhcontroller,password=dagethot"
+            cmd = "mount -t cifs //IP.IP.IP.IP/share /local/mountpoint -o username=user,password=pass"
             for outline in os.popen(cmd).readlines():
                 outline = outline[:-1];
                 print outline
         #if we still weren't able to establish a connection to the fileshare we won't attempt to log data
-        if (not os.path.isfile("/media/firestation/connected")):
+        if (not os.path.isfile("/local/mountpoint/connected")):
             print "Unable to mount share...continuing"
             continue
 
