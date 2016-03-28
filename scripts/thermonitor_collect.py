@@ -70,7 +70,7 @@ ROM 10 0x28 0x6F 0xCB 0x82 0x05 0x00 0x00 0x40
 
 """
 
-API_ZONE_KEY = "FDEA9C52EBCA4F6D9B873FFF059F0392"
+API_ZONE_KEY = "ZONEKEY"
 API_URL = "http://localhost:9000/api/v1/"
 API_HEADERS = {'Content-type': 'application/json'}
 API_TIMEOUT = 4.0  # Time out API requests after this many seconds
